@@ -754,6 +754,7 @@ function GetStartedPage({ onNavigate, integrations, userName }) {
 }
 
 // Enhanced Home Page
+// Enhanced Home Page with new sections
 function HomePage({ onNavigate, userName }) {
   const activities = [
     {
@@ -842,16 +843,6 @@ function HomePage({ onNavigate, userName }) {
               boxShadow: "0 5px 15px rgba(102, 126, 234, 0.3)",
               transition: "all 0.3s",
             }}
-            onMouseOver={(e) => {
-              e.currentTarget.style.transform = "translateY(-2px)";
-              e.currentTarget.style.boxShadow =
-                "0 8px 20px rgba(102, 126, 234, 0.4)";
-            }}
-            onMouseOut={(e) => {
-              e.currentTarget.style.transform = "translateY(0)";
-              e.currentTarget.style.boxShadow =
-                "0 5px 15px rgba(102, 126, 234, 0.3)";
-            }}
           >
             Logout
           </button>
@@ -861,6 +852,7 @@ function HomePage({ onNavigate, userName }) {
       <main
         style={{ maxWidth: "80rem", margin: "0 auto", padding: "3rem 2rem" }}
       >
+        {/* Overview Header */}
         <div style={{ marginBottom: "3rem" }}>
           <h2
             style={{
@@ -877,6 +869,7 @@ function HomePage({ onNavigate, userName }) {
           </p>
         </div>
 
+        {/* Stats Cards */}
         <div
           style={{
             display: "grid",
@@ -891,324 +884,145 @@ function HomePage({ onNavigate, userName }) {
               label: "Projects",
               value: "12",
               change: "+3 this week",
-              gradient: "linear-gradient(135deg, #667eea 0%, #764ba2 100%)",
-              color: "#667eea",
             },
+            { icon: Clock, label: "Tasks", value: "48", change: "18 pending" },
             {
-              icon: Clock,
-              label: "Tasks",
-              value: "48",
-              change: "18 pending",
-              gradient: "linear-gradient(135deg, #f093fb 0%, #f5576c 100%)",
-              color: "#f5576c",
-            },
-            {
-              icon: CheckCircle,
-              label: "Completed",
-              value: "34",
-              change: "+12 today",
-              gradient: "linear-gradient(135deg, #4facfe 0%, #00f2fe 100%)",
-              color: "#00f2fe",
+              icon: Users,
+              label: "Team Members",
+              value: "9",
+              change: "+2 this month",
             },
           ].map((stat, i) => (
-            <div
-              key={i}
-              style={{
-                ...styles.statsCard,
-                background: "white",
-                borderLeft: `5px solid ${stat.color}`,
-              }}
-              onMouseOver={(e) => {
-                e.currentTarget.style.transform = "translateY(-8px)";
-                e.currentTarget.style.boxShadow =
-                  "0 20px 40px rgba(0, 0, 0, 0.12)";
-              }}
-              onMouseOut={(e) => {
-                e.currentTarget.style.transform = "translateY(0)";
-                e.currentTarget.style.boxShadow =
-                  "0 10px 30px rgba(0, 0, 0, 0.08)";
-              }}
-            >
+            <div key={i} style={styles.statsCard}>
               <div
-                style={{
-                  display: "flex",
-                  justifyContent: "space-between",
-                  alignItems: "start",
-                  marginBottom: "1rem",
-                }}
+                style={{ display: "flex", alignItems: "center", gap: "1rem" }}
               >
+                <div
+                  style={{
+                    ...styles.iconBox,
+                    background:
+                      "linear-gradient(135deg, #667eea 0%, #764ba2 100%)",
+                    width: "60px",
+                    height: "60px",
+                  }}
+                >
+                  <stat.icon color="white" size={28} />
+                </div>
                 <div>
-                  <h3
+                  <h4
                     style={{
-                      color: "#6b7280",
-                      fontSize: "0.95rem",
-                      fontWeight: "600",
-                      marginBottom: "0.5rem",
-                    }}
-                  >
-                    {stat.label}
-                  </h3>
-                  <p
-                    style={{
-                      fontSize: "2.5rem",
-                      fontWeight: "900",
+                      fontSize: "1.25rem",
+                      fontWeight: "700",
                       color: "#1f2937",
                     }}
                   >
-                    {stat.value}
-                  </p>
+                    {stat.label}
+                  </h4>
+                  <p style={{ color: "#6b7280", margin: 0 }}>{stat.change}</p>
                 </div>
-                <div
+                <span
                   style={{
-                    width: "60px",
-                    height: "60px",
-                    borderRadius: "15px",
-                    background: stat.gradient,
-                    display: "flex",
-                    alignItems: "center",
-                    justifyContent: "center",
-                    boxShadow: "0 8px 16px rgba(0, 0, 0, 0.1)",
+                    marginLeft: "auto",
+                    fontSize: "1.75rem",
+                    fontWeight: "800",
                   }}
                 >
-                  <stat.icon size={28} color="white" />
-                </div>
-              </div>
-              <div
-                style={{
-                  display: "inline-flex",
-                  alignItems: "center",
-                  gap: "0.25rem",
-                  padding: "0.5rem 1rem",
-                  borderRadius: "20px",
-                  backgroundColor: "#f0fdf4",
-                  color: "#16a34a",
-                  fontSize: "0.85rem",
-                  fontWeight: "600",
-                }}
-              >
-                <TrendingUp size={14} />
-                {stat.change}
+                  {stat.value}
+                </span>
               </div>
             </div>
           ))}
         </div>
 
+        {/* === NEW SECTIONS === */}
         <div
           style={{
-            backgroundColor: "white",
-            borderRadius: "2rem",
-            boxShadow: "0 10px 30px rgba(0, 0, 0, 0.08)",
-            padding: "2.5rem",
-            border: "1px solid rgba(0, 0, 0, 0.05)",
-          }}
-        >
-          <div
-            style={{
-              display: "flex",
-              justifyContent: "space-between",
-              alignItems: "center",
-              marginBottom: "2rem",
-            }}
-          >
-            <h3
-              style={{
-                fontSize: "1.75rem",
-                fontWeight: "800",
-                color: "#1f2937",
-              }}
-            >
-              Recent Activity
-            </h3>
-            <span
-              style={{
-                ...styles.badge,
-                backgroundColor: "#ede9fe",
-                color: "#7c3aed",
-              }}
-            >
-              <Clock size={14} />
-              Live Updates
-            </span>
-          </div>
-
-          <div
-            style={{ display: "flex", flexDirection: "column", gap: "1rem" }}
-          >
-            {activities.map((activity, i) => (
-              <div
-                key={i}
-                style={{
-                  display: "flex",
-                  alignItems: "center",
-                  gap: "1.5rem",
-                  padding: "1.5rem",
-                  backgroundColor: "#f9fafb",
-                  borderRadius: "1rem",
-                  border: "1px solid #e5e7eb",
-                  transition: "all 0.3s",
-                  cursor: "pointer",
-                }}
-                onMouseOver={(e) => {
-                  e.currentTarget.style.backgroundColor = "#f3f4f6";
-                  e.currentTarget.style.borderColor = "#667eea";
-                  e.currentTarget.style.transform = "translateX(5px)";
-                }}
-                onMouseOut={(e) => {
-                  e.currentTarget.style.backgroundColor = "#f9fafb";
-                  e.currentTarget.style.borderColor = "#e5e7eb";
-                  e.currentTarget.style.transform = "translateX(0)";
-                }}
-              >
-                <div
-                  style={{
-                    width: "12px",
-                    height: "12px",
-                    background:
-                      activity.type === "success"
-                        ? "linear-gradient(135deg, #10b981 0%, #059669 100%)"
-                        : activity.type === "warning"
-                        ? "linear-gradient(135deg, #f59e0b 0%, #d97706 100%)"
-                        : "linear-gradient(135deg, #3b82f6 0%, #2563eb 100%)",
-                    borderRadius: "50%",
-                    boxShadow: "0 0 0 4px rgba(102, 126, 234, 0.1)",
-                  }}
-                ></div>
-                <div style={{ flex: 1 }}>
-                  <p
-                    style={{
-                      fontWeight: "600",
-                      color: "#1f2937",
-                      fontSize: "1.05rem",
-                      marginBottom: "0.25rem",
-                    }}
-                  >
-                    {activity.title}
-                  </p>
-                  <p
-                    style={{
-                      fontSize: "0.875rem",
-                      color: "#9ca3af",
-                      display: "flex",
-                      alignItems: "center",
-                      gap: "0.25rem",
-                    }}
-                  >
-                    <Clock size={12} />
-                    {activity.time}
-                  </p>
-                </div>
-                <ChevronRight size={20} color="#9ca3af" />
-              </div>
-            ))}
-          </div>
-        </div>
-
-        <div
-          style={{
-            marginTop: "3rem",
             display: "grid",
-            gridTemplateColumns: "repeat(auto-fit, minmax(300px, 1fr))",
+            gridTemplateColumns: "repeat(auto-fit, minmax(350px, 1fr))",
             gap: "2rem",
           }}
         >
-          <div
-            style={{
-              backgroundColor: "white",
-              borderRadius: "1.5rem",
-              padding: "2rem",
-              boxShadow: "0 10px 30px rgba(0, 0, 0, 0.08)",
-              background: "linear-gradient(135deg, #667eea 0%, #764ba2 100%)",
-              color: "white",
-              position: "relative",
-              overflow: "hidden",
-            }}
-          >
-            <div
-              style={{
-                position: "absolute",
-                top: "-20px",
-                right: "-20px",
-                width: "100px",
-                height: "100px",
-                borderRadius: "50%",
-                backgroundColor: "rgba(255, 255, 255, 0.1)",
-              }}
-            ></div>
-            <Zap
-              size={40}
-              style={{ marginBottom: "1rem", position: "relative", zIndex: 1 }}
-            />
-            <h4
+          {/* Today's Focus */}
+          <div style={styles.statsCard}>
+            <h3
               style={{
                 fontSize: "1.5rem",
                 fontWeight: "800",
-                marginBottom: "0.5rem",
-                position: "relative",
-                zIndex: 1,
+                marginBottom: "1rem",
               }}
             >
-              Productivity Boost
-            </h4>
-            <p
-              style={{
-                fontSize: "0.95rem",
-                opacity: 0.9,
-                position: "relative",
-                zIndex: 1,
-              }}
-            >
-              You're 23% more productive this week! Keep up the great work.
-            </p>
+              Today’s Focus 🎯
+            </h3>
+            <ul style={{ paddingLeft: "1.25rem", color: "#374151" }}>
+              <li>Finish UI updates for project dashboard</li>
+              <li>Prepare report for client review</li>
+              <li>Team check-in at 2:00 PM</li>
+            </ul>
           </div>
 
-          <div
-            style={{
-              backgroundColor: "white",
-              borderRadius: "1.5rem",
-              padding: "2rem",
-              boxShadow: "0 10px 30px rgba(0, 0, 0, 0.08)",
-              background: "linear-gradient(135deg, #f093fb 0%, #f5576c 100%)",
-              color: "white",
-              position: "relative",
-              overflow: "hidden",
-            }}
-          >
-            <div
-              style={{
-                position: "absolute",
-                bottom: "-30px",
-                left: "-30px",
-                width: "120px",
-                height: "120px",
-                borderRadius: "50%",
-                backgroundColor: "rgba(255, 255, 255, 0.1)",
-              }}
-            ></div>
-            <Star
-              size={40}
-              style={{ marginBottom: "1rem", position: "relative", zIndex: 1 }}
-            />
-            <h4
+          {/* Meetings Today */}
+          <div style={styles.statsCard}>
+            <h3
               style={{
                 fontSize: "1.5rem",
                 fontWeight: "800",
-                marginBottom: "0.5rem",
-                position: "relative",
-                zIndex: 1,
+                marginBottom: "1rem",
               }}
             >
-              Achievement Unlocked
-            </h4>
-            <p
+              Meetings Today 📅
+            </h3>
+            <ul style={{ paddingLeft: "1.25rem", color: "#374151" }}>
+              <li>10:00 AM - Design Sync with UI Team</li>
+              <li>2:00 PM - Weekly Standup</li>
+              <li>4:30 PM - Client Review Call</li>
+            </ul>
+          </div>
+
+          {/* Quick Actions */}
+          <div style={styles.statsCard}>
+            <h3
               style={{
-                fontSize: "0.95rem",
-                opacity: 0.9,
-                position: "relative",
-                zIndex: 1,
+                fontSize: "1.5rem",
+                fontWeight: "800",
+                marginBottom: "1rem",
               }}
             >
-              You've completed 50 tasks this month! 🎉
+              Quick Actions ⚡
+            </h3>
+            <div
+              style={{ display: "flex", flexDirection: "column", gap: "1rem" }}
+            >
+              <button style={styles.button}>Create New Task</button>
+              <button style={styles.button}>Schedule Meeting</button>
+              <button style={styles.button}>View Reports</button>
+            </div>
+          </div>
+
+          {/* Ask Devbeing */}
+          <div style={styles.statsCard}>
+            <h3
+              style={{
+                fontSize: "1.5rem",
+                fontWeight: "800",
+                marginBottom: "1rem",
+              }}
+            >
+              Ask Devbeing 💬
+            </h3>
+            <p style={{ color: "#374151", marginBottom: "1rem" }}>
+              Have a question or need help with your code? Ask Devbeing for
+              instant guidance.
             </p>
+            <input
+              type="text"
+              placeholder="Type your question here..."
+              style={{
+                ...styles.input,
+                marginBottom: "1rem",
+                borderRadius: "10px",
+              }}
+            />
+            <button style={styles.button}>Ask Now</button>
           </div>
         </div>
       </main>
