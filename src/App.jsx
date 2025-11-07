@@ -9,10 +9,8 @@ import {
   UserPlus,
   Sparkles,
   Zap,
-  TrendingUp,
   Users,
   CheckCircle,
-  Clock,
   Star,
 } from "lucide-react";
 
@@ -43,7 +41,6 @@ const styles = {
     position: "absolute",
     borderRadius: "50%",
     opacity: 0.1,
-    animation: "float 6s ease-in-out infinite",
   },
   button: {
     background: "linear-gradient(135deg, #667eea 0%, #764ba2 100%)",
@@ -133,6 +130,32 @@ const styles = {
     fontSize: "0.875rem",
     fontWeight: "600",
   },
+  progressBarContainer: {
+    width: "100%",
+    height: "12px",
+    backgroundColor: "#e5e7eb",
+    borderRadius: "10px",
+    overflow: "hidden",
+    marginBottom: "1.5rem",
+    marginTop: "0.5rem",
+  },
+  progressBarFill: {
+    height: "100%",
+    background: "linear-gradient(90deg, #667eea 0%, #764ba2 100%)",
+    borderRadius: "10px",
+    transition: "width 1s ease-in-out",
+  },
+  cardTitle: {
+    fontSize: "1.5rem",
+    fontWeight: "800",
+    marginBottom: "1.5rem",
+    color: "#1f2937",
+  },
+  checkList: {
+    listStyle: "none",
+    padding: 0,
+    margin: 0,
+  },
 };
 
 // Router Component
@@ -178,6 +201,7 @@ function LandingPage({ onNavigate }) {
           top: "10%",
           left: "10%",
           backgroundColor: "white",
+          animation: "float 6s ease-in-out infinite",
         }}
       ></div>
       <div
@@ -188,6 +212,7 @@ function LandingPage({ onNavigate }) {
           bottom: "15%",
           right: "15%",
           backgroundColor: "white",
+          animation: "float 8s ease-in-out infinite",
         }}
       ></div>
       <div
@@ -198,6 +223,7 @@ function LandingPage({ onNavigate }) {
           top: "60%",
           left: "70%",
           backgroundColor: "white",
+          animation: "float 7s ease-in-out infinite",
         }}
       ></div>
 
@@ -340,6 +366,7 @@ function AuthPage({ onNavigate, userAuth, userName }) {
           top: "5%",
           right: "10%",
           backgroundColor: "white",
+          animation: "float 6s ease-in-out infinite",
         }}
       ></div>
       <div
@@ -350,6 +377,7 @@ function AuthPage({ onNavigate, userAuth, userName }) {
           bottom: "10%",
           left: "5%",
           backgroundColor: "white",
+          animation: "float 8s ease-in-out infinite",
         }}
       ></div>
 
@@ -754,22 +782,13 @@ function GetStartedPage({ onNavigate, integrations, userName }) {
 }
 
 // Enhanced Home Page
-// Enhanced Home Page with new sections
 function HomePage({ onNavigate, userName }) {
-  const activities = [
-    {
-      title: "Project Alpha launched successfully",
-      time: "2 minutes ago",
-      type: "success",
-    },
-    { title: "New team member joined", time: "1 hour ago", type: "info" },
-    { title: "Code review completed", time: "3 hours ago", type: "success" },
-    {
-      title: "Meeting scheduled for tomorrow",
-      time: "5 hours ago",
-      type: "warning",
-    },
-  ];
+  const [tasksCompleted, setTasksCompleted] = useState([false, false, false]);
+  const [meetingsCompleted, setMeetingsCompleted] = useState([
+    false,
+    false,
+    false,
+  ]);
 
   return (
     <div
@@ -778,6 +797,7 @@ function HomePage({ onNavigate, userName }) {
         background: "linear-gradient(135deg, #f5f7fa 0%, #c3cfe2 100%)",
       }}
     >
+      {/* Header */}
       <header
         style={{
           background: "rgba(255, 255, 255, 0.95)",
@@ -830,29 +850,16 @@ function HomePage({ onNavigate, userName }) {
               </p>
             </div>
           </div>
-          <button
-            onClick={() => onNavigate("landing")}
-            style={{
-              padding: "0.75rem 1.5rem",
-              color: "white",
-              fontWeight: "600",
-              background: "linear-gradient(135deg, #667eea 0%, #764ba2 100%)",
-              border: "none",
-              borderRadius: "12px",
-              cursor: "pointer",
-              boxShadow: "0 5px 15px rgba(102, 126, 234, 0.3)",
-              transition: "all 0.3s",
-            }}
-          >
+          <button onClick={() => onNavigate("landing")} style={styles.button}>
             Logout
           </button>
         </div>
       </header>
 
+      {/* Main */}
       <main
         style={{ maxWidth: "80rem", margin: "0 auto", padding: "3rem 2rem" }}
       >
-        {/* Overview Header */}
         <div style={{ marginBottom: "3rem" }}>
           <h2
             style={{
@@ -865,76 +872,115 @@ function HomePage({ onNavigate, userName }) {
             Your Performance Overview
           </h2>
           <p style={{ color: "#6b7280", fontSize: "1.1rem" }}>
-            Track your progress and achievements
+            Track your weekly progress and Devbeing performance
           </p>
         </div>
 
-        {/* Stats Cards */}
-        <div
-          style={{
-            display: "grid",
-            gridTemplateColumns: "repeat(auto-fit, minmax(280px, 1fr))",
-            gap: "2rem",
-            marginBottom: "3rem",
-          }}
-        >
-          {[
-            {
-              icon: TrendingUp,
-              label: "Projects",
-              value: "12",
-              change: "+3 this week",
-            },
-            { icon: Clock, label: "Tasks", value: "48", change: "18 pending" },
-            {
-              icon: Users,
-              label: "Team Members",
-              value: "9",
-              change: "+2 this month",
-            },
-          ].map((stat, i) => (
-            <div key={i} style={styles.statsCard}>
-              <div
-                style={{ display: "flex", alignItems: "center", gap: "1rem" }}
-              >
-                <div
-                  style={{
-                    ...styles.iconBox,
-                    background:
-                      "linear-gradient(135deg, #667eea 0%, #764ba2 100%)",
-                    width: "60px",
-                    height: "60px",
-                  }}
-                >
-                  <stat.icon color="white" size={28} />
-                </div>
-                <div>
-                  <h4
-                    style={{
-                      fontSize: "1.25rem",
-                      fontWeight: "700",
-                      color: "#1f2937",
-                    }}
-                  >
-                    {stat.label}
-                  </h4>
-                  <p style={{ color: "#6b7280", margin: 0 }}>{stat.change}</p>
-                </div>
-                <span
-                  style={{
-                    marginLeft: "auto",
-                    fontSize: "1.75rem",
-                    fontWeight: "800",
-                  }}
-                >
-                  {stat.value}
-                </span>
-              </div>
+        {/* Weekly Insights */}
+        <div style={{ ...styles.statsCard, marginBottom: "3rem" }}>
+          <h3
+            style={{
+              fontSize: "1.75rem",
+              fontWeight: "800",
+              marginBottom: "1rem",
+            }}
+          >
+            Weekly Insights 📊
+          </h3>
+          <div style={{ color: "#374151" }}>
+            <p style={{ marginBottom: "0.5rem" }}>
+              <strong>Tasks Completed:</strong> 42 / 50
+            </p>
+            <div style={styles.progressBarContainer}>
+              <div style={{ ...styles.progressBarFill, width: "84%" }} />
             </div>
-          ))}
+
+            <p style={{ marginBottom: "0.5rem" }}>
+              <strong>Productivity:</strong> 92%
+            </p>
+            <div style={styles.progressBarContainer}>
+              <div
+                style={{
+                  ...styles.progressBarFill,
+                  width: "92%",
+                  background: "#10b981",
+                }}
+              />
+            </div>
+
+            <p style={{ marginBottom: "0.5rem" }}>
+              <strong>Team Collaboration:</strong> 76%
+            </p>
+            <div style={styles.progressBarContainer}>
+              <div
+                style={{
+                  ...styles.progressBarFill,
+                  width: "76%",
+                  background: "#3b82f6",
+                }}
+              />
+            </div>
+
+            <p>
+              <strong>Goals Achieved:</strong> 5 / 6 this week 🎯
+            </p>
+          </div>
         </div>
 
-        {/* === NEW SECTIONS === */}
+        {/* Devbeing Scores */}
+        <div style={{ ...styles.statsCard, marginBottom: "3rem" }}>
+          <h3
+            style={{
+              fontSize: "1.75rem",
+              fontWeight: "800",
+              marginBottom: "1rem",
+            }}
+          >
+            Devbeing Scores 💎
+          </h3>
+          <div
+            style={{
+              display: "grid",
+              gridTemplateColumns: "repeat(auto-fit, minmax(160px, 1fr))",
+              gap: "1.5rem",
+              justifyItems: "center",
+            }}
+          >
+            {[
+              { label: "Focus", score: 92, color: "#10b981" },
+              { label: "Communication", score: 87, color: "#3b82f6" },
+              { label: "Learning", score: 94, color: "#8b5cf6" },
+              { label: "Consistency", score: 90, color: "#f59e0b" },
+            ].map((metric, i) => (
+              <div key={i} style={{ textAlign: "center" }}>
+                <div
+                  style={{
+                    width: "100px",
+                    height: "100px",
+                    borderRadius: "50%",
+                    border: `6px solid ${metric.color}`,
+                    display: "flex",
+                    alignItems: "center",
+                    justifyContent: "center",
+                    fontSize: "1.25rem",
+                    fontWeight: "800",
+                    color: "#1f2937",
+                    margin: "0 auto 0.5rem",
+                    background: "white",
+                    boxShadow: "0 4px 10px rgba(0,0,0,0.05)",
+                  }}
+                >
+                  {metric.score}%
+                </div>
+                <p style={{ fontWeight: "600", color: "#4b5563" }}>
+                  {metric.label}
+                </p>
+              </div>
+            ))}
+          </div>
+        </div>
+
+        {/* Dashboard Sections with Checkboxes */}
         <div
           style={{
             display: "grid",
@@ -944,51 +990,97 @@ function HomePage({ onNavigate, userName }) {
         >
           {/* Today's Focus */}
           <div style={styles.statsCard}>
-            <h3
-              style={{
-                fontSize: "1.5rem",
-                fontWeight: "800",
-                marginBottom: "1rem",
-              }}
+            <h3 style={styles.cardTitle}>Today's Focus 🎯</h3>
+            <div
+              style={{ display: "flex", flexDirection: "column", gap: "1rem" }}
             >
-              Today’s Focus 🎯
-            </h3>
-            <ul style={{ paddingLeft: "1.25rem", color: "#374151" }}>
-              <li>Finish UI updates for project dashboard</li>
-              <li>Prepare report for client review</li>
-              <li>Team check-in at 2:00 PM</li>
-            </ul>
+              {[
+                "Finish UI updates for project dashboard",
+                "Prepare report for client review",
+                "Team check-in at 2:00 PM",
+              ].map((task, i) => (
+                <label
+                  key={i}
+                  style={{
+                    display: "flex",
+                    alignItems: "center",
+                    gap: "0.75rem",
+                    cursor: "pointer",
+                  }}
+                >
+                  <input
+                    type="checkbox"
+                    checked={tasksCompleted[i]}
+                    onChange={() => {
+                      const newTasks = [...tasksCompleted];
+                      newTasks[i] = !newTasks[i];
+                      setTasksCompleted(newTasks);
+                    }}
+                    style={{ width: "18px", height: "18px", cursor: "pointer" }}
+                  />
+                  <span
+                    style={{
+                      textDecoration: tasksCompleted[i]
+                        ? "line-through"
+                        : "none",
+                      color: tasksCompleted[i] ? "#9ca3af" : "#374151",
+                    }}
+                  >
+                    {task}
+                  </span>
+                </label>
+              ))}
+            </div>
           </div>
 
-          {/* Meetings Today */}
+          {/* Meetings */}
           <div style={styles.statsCard}>
-            <h3
-              style={{
-                fontSize: "1.5rem",
-                fontWeight: "800",
-                marginBottom: "1rem",
-              }}
+            <h3 style={styles.cardTitle}>Meetings Today 📅</h3>
+            <div
+              style={{ display: "flex", flexDirection: "column", gap: "1rem" }}
             >
-              Meetings Today 📅
-            </h3>
-            <ul style={{ paddingLeft: "1.25rem", color: "#374151" }}>
-              <li>10:00 AM - Design Sync with UI Team</li>
-              <li>2:00 PM - Weekly Standup</li>
-              <li>4:30 PM - Client Review Call</li>
-            </ul>
+              {[
+                "10:00 AM - Design Sync with UI Team",
+                "2:00 PM - Weekly Standup",
+                "4:30 PM - Client Review Call",
+              ].map((meeting, i) => (
+                <label
+                  key={i}
+                  style={{
+                    display: "flex",
+                    alignItems: "center",
+                    gap: "0.75rem",
+                    cursor: "pointer",
+                  }}
+                >
+                  <input
+                    type="checkbox"
+                    checked={meetingsCompleted[i]}
+                    onChange={() => {
+                      const newMeetings = [...meetingsCompleted];
+                      newMeetings[i] = !newMeetings[i];
+                      setMeetingsCompleted(newMeetings);
+                    }}
+                    style={{ width: "18px", height: "18px", cursor: "pointer" }}
+                  />
+                  <span
+                    style={{
+                      textDecoration: meetingsCompleted[i]
+                        ? "line-through"
+                        : "none",
+                      color: meetingsCompleted[i] ? "#9ca3af" : "#374151",
+                    }}
+                  >
+                    {meeting}
+                  </span>
+                </label>
+              ))}
+            </div>
           </div>
 
           {/* Quick Actions */}
           <div style={styles.statsCard}>
-            <h3
-              style={{
-                fontSize: "1.5rem",
-                fontWeight: "800",
-                marginBottom: "1rem",
-              }}
-            >
-              Quick Actions ⚡
-            </h3>
+            <h3 style={styles.cardTitle}>Quick Actions ⚡</h3>
             <div
               style={{ display: "flex", flexDirection: "column", gap: "1rem" }}
             >
@@ -1000,15 +1092,7 @@ function HomePage({ onNavigate, userName }) {
 
           {/* Ask Devbeing */}
           <div style={styles.statsCard}>
-            <h3
-              style={{
-                fontSize: "1.5rem",
-                fontWeight: "800",
-                marginBottom: "1rem",
-              }}
-            >
-              Ask Devbeing 💬
-            </h3>
+            <h3 style={styles.cardTitle}>Ask Devbeing 💬</h3>
             <p style={{ color: "#374151", marginBottom: "1rem" }}>
               Have a question or need help with your code? Ask Devbeing for
               instant guidance.
@@ -1045,6 +1129,9 @@ export default function App() {
         @keyframes float {
           0%, 100% { transform: translateY(0) rotate(0deg); }
           50% { transform: translateY(-20px) rotate(5deg); }
+        }
+        * {
+          box-sizing: border-box;
         }
       `}</style>
       <Router
