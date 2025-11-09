@@ -1,19 +1,21 @@
 import React, { useState } from "react";
 import {
-  ChevronRight,
-  Github,
-  Mail,
+  Calendar,
+  Clock,
+  AlertCircle,
+  TrendingUp,
   MessageSquare,
-  Home,
-  LogIn,
-  UserPlus,
-  Sparkles,
-  Zap,
-  Users,
+  GitBranch,
+  Mail,
   CheckCircle,
-  Star,
+  X,
+  ChevronRight,
+  Coffee,
+  Moon,
+  Zap,
+  Settings,
+  Home,
 } from "lucide-react";
-
 // Enhanced Styles
 const styles = {
   gradientPurple: {
@@ -782,19 +784,105 @@ function GetStartedPage({ onNavigate, integrations, userName }) {
 }
 
 // Enhanced Home Page
+
 function HomePage({ onNavigate, userName }) {
-  const [tasksCompleted, setTasksCompleted] = useState([false, false, false]);
-  const [meetingsCompleted, setMeetingsCompleted] = useState([
-    false,
-    false,
-    false,
-  ]);
+  const [activeTab, setActiveTab] = useState("today");
+  const [showAlert, setShowAlert] = useState(true);
+  const [completedTasks, setCompletedTasks] = useState([]);
+  const [completedMeetings, setCompletedMeetings] = useState([]);
+
+  const wellbeingScore = 72;
+
+  const tasks = [
+    {
+      id: 1,
+      title: "Fix production bug in payment service",
+      priority: "urgent",
+      time: "9:00-11:00 AM",
+      source: "github",
+      energy: "high",
+    },
+    {
+      id: 2,
+      title: "Code review: Frontend refactor PR",
+      priority: "high",
+      time: "2:00-2:30 PM",
+      source: "github",
+      energy: "medium",
+    },
+    {
+      id: 3,
+      title: "Respond to design team on API specs",
+      priority: "medium",
+      time: "2:30-3:00 PM",
+      source: "slack",
+      energy: "medium",
+    },
+    {
+      id: 4,
+      title: "Update documentation for new endpoints",
+      priority: "low",
+      time: "4:00-5:00 PM",
+      source: "github",
+      energy: "low",
+    },
+  ];
+
+  const meetings = [
+    {
+      id: 1,
+      title: "Sprint Planning",
+      time: "11:30 AM - 12:30 PM",
+      skippable: false,
+    },
+    {
+      id: 2,
+      title: "Daily Standup",
+      time: "4:00 PM",
+      skippable: true,
+      suggestion: "Could be async?",
+    },
+  ];
+
+  const insights = [
+    {
+      type: "warning",
+      text: "You worked 52 hours last week, 12 over your goal",
+      icon: AlertCircle,
+    },
+    {
+      type: "positive",
+      text: "Great job taking breaks! +15% focus time",
+      icon: TrendingUp,
+    },
+    {
+      type: "info",
+      text: "3 PRs waiting on your review for 2+ days",
+      icon: GitBranch,
+    },
+  ];
+
+  const toggleTask = (taskId) => {
+    setCompletedTasks((prev) =>
+      prev.includes(taskId)
+        ? prev.filter((id) => id !== taskId)
+        : [...prev, taskId]
+    );
+  };
+
+  const toggleMeeting = (meetingId) => {
+    setCompletedMeetings((prev) =>
+      prev.includes(meetingId)
+        ? prev.filter((id) => id !== meetingId)
+        : [...prev, meetingId]
+    );
+  };
 
   return (
     <div
       style={{
         minHeight: "100vh",
-        background: "linear-gradient(135deg, #f5f7fa 0%, #c3cfe2 100%)",
+        background: "linear-gradient(135deg, #667eea 0%, #764ba2 100%)",
       }}
     >
       {/* Header */}
@@ -843,10 +931,10 @@ function HomePage({ onNavigate, userName }) {
                   marginBottom: "0.25rem",
                 }}
               >
-                Dashboard
+                DevWell Dashboard
               </h1>
               <p style={{ fontSize: "0.85rem", color: "#6b7280" }}>
-                Welcome back, {userName.name}
+                Welcome back, {userName?.name || "User"}
               </p>
             </div>
           </div>
@@ -856,257 +944,688 @@ function HomePage({ onNavigate, userName }) {
         </div>
       </header>
 
-      {/* Main */}
+      {/* Main Content */}
       <main
         style={{ maxWidth: "80rem", margin: "0 auto", padding: "3rem 2rem" }}
       >
-        <div style={{ marginBottom: "3rem" }}>
-          <h2
-            style={{
-              fontSize: "2.25rem",
-              fontWeight: "900",
-              color: "#1f2937",
-              marginBottom: "0.5rem",
-            }}
-          >
-            Your Performance Overview
-          </h2>
-          <p style={{ color: "#6b7280", fontSize: "1.1rem" }}>
-            Track your weekly progress and Devbeing performance
-          </p>
-        </div>
-
-        {/* Weekly Insights */}
-        <div style={{ ...styles.statsCard, marginBottom: "3rem" }}>
-          <h3
-            style={{
-              fontSize: "1.75rem",
-              fontWeight: "800",
-              marginBottom: "1rem",
-            }}
-          >
-            Weekly Insights 📊
-          </h3>
-          <div style={{ color: "#374151" }}>
-            <p style={{ marginBottom: "0.5rem" }}>
-              <strong>Tasks Completed:</strong> 42 / 50
-            </p>
-            <div style={styles.progressBarContainer}>
-              <div style={{ ...styles.progressBarFill, width: "84%" }} />
-            </div>
-
-            <p style={{ marginBottom: "0.5rem" }}>
-              <strong>Productivity:</strong> 92%
-            </p>
-            <div style={styles.progressBarContainer}>
-              <div
-                style={{
-                  ...styles.progressBarFill,
-                  width: "92%",
-                  background: "#10b981",
-                }}
-              />
-            </div>
-
-            <p style={{ marginBottom: "0.5rem" }}>
-              <strong>Team Collaboration:</strong> 76%
-            </p>
-            <div style={styles.progressBarContainer}>
-              <div
-                style={{
-                  ...styles.progressBarFill,
-                  width: "76%",
-                  background: "#3b82f6",
-                }}
-              />
-            </div>
-
-            <p>
-              <strong>Goals Achieved:</strong> 5 / 6 this week 🎯
-            </p>
-          </div>
-        </div>
-
-        {/* Devbeing Scores */}
-        <div style={{ ...styles.statsCard, marginBottom: "3rem" }}>
-          <h3
-            style={{
-              fontSize: "1.75rem",
-              fontWeight: "800",
-              marginBottom: "1rem",
-            }}
-          >
-            Devbeing Scores 💎
-          </h3>
+        {/* Alert Banner */}
+        {showAlert && (
           <div
             style={{
-              display: "grid",
-              gridTemplateColumns: "repeat(auto-fit, minmax(160px, 1fr))",
-              gap: "1.5rem",
-              justifyItems: "center",
+              background: "rgba(245, 158, 11, 0.1)",
+              backdropFilter: "blur(10px)",
+              border: "2px solid rgba(245, 158, 11, 0.3)",
+              borderRadius: "20px",
+              padding: "1.5rem",
+              marginBottom: "2rem",
+              display: "flex",
+              alignItems: "flex-start",
+              justifyContent: "space-between",
+              boxShadow: "0 10px 30px rgba(245, 158, 11, 0.2)",
             }}
           >
-            {[
-              { label: "Focus", score: 92, color: "#10b981" },
-              { label: "Communication", score: 87, color: "#3b82f6" },
-              { label: "Learning", score: 94, color: "#8b5cf6" },
-              { label: "Consistency", score: 90, color: "#f59e0b" },
-            ].map((metric, i) => (
-              <div key={i} style={{ textAlign: "center" }}>
-                <div
+            <div
+              style={{ display: "flex", alignItems: "flex-start", gap: "1rem" }}
+            >
+              <AlertCircle
+                style={{
+                  width: "24px",
+                  height: "24px",
+                  color: "#f59e0b",
+                  marginTop: "2px",
+                  flexShrink: 0,
+                }}
+              />
+              <div>
+                <p
                   style={{
-                    width: "100px",
-                    height: "100px",
-                    borderRadius: "50%",
-                    border: `6px solid ${metric.color}`,
-                    display: "flex",
-                    alignItems: "center",
-                    justifyContent: "center",
-                    fontSize: "1.25rem",
-                    fontWeight: "800",
-                    color: "#1f2937",
-                    margin: "0 auto 0.5rem",
-                    background: "white",
-                    boxShadow: "0 4px 10px rgba(0,0,0,0.05)",
+                    fontWeight: "700",
+                    color: "#f59e0b",
+                    fontSize: "1.1rem",
                   }}
                 >
-                  {metric.score}%
-                </div>
-                <p style={{ fontWeight: "600", color: "#4b5563" }}>
-                  {metric.label}
+                  Burnout Warning
                 </p>
+                <p
+                  style={{
+                    fontSize: "0.95rem",
+                    color: "#374151",
+                    marginTop: "0.5rem",
+                    lineHeight: "1.6",
+                  }}
+                >
+                  Hey! I'm concerned. You've worked past 7pm every day this week
+                  and committed code at midnight twice. Your response times are
+                  slowing. Can we talk about reprioritizing some deadlines?
+                </p>
+                <div
+                  style={{ display: "flex", gap: "0.75rem", marginTop: "1rem" }}
+                >
+                  <button
+                    style={{
+                      padding: "0.5rem 1rem",
+                      background: "#f59e0b",
+                      color: "white",
+                      border: "none",
+                      borderRadius: "10px",
+                      fontSize: "0.9rem",
+                      fontWeight: "600",
+                      cursor: "pointer",
+                    }}
+                  >
+                    Review Schedule
+                  </button>
+                  <button
+                    style={{
+                      padding: "0.5rem 1rem",
+                      background: "rgba(0,0,0,0.1)",
+                      color: "#374151",
+                      border: "none",
+                      borderRadius: "10px",
+                      fontSize: "0.9rem",
+                      fontWeight: "600",
+                      cursor: "pointer",
+                    }}
+                  >
+                    Remind Me Later
+                  </button>
+                </div>
               </div>
-            ))}
+            </div>
+            <X
+              style={{
+                width: "24px",
+                height: "24px",
+                color: "#9ca3af",
+                cursor: "pointer",
+                flexShrink: 0,
+              }}
+              onClick={() => setShowAlert(false)}
+            />
           </div>
-        </div>
+        )}
 
-        {/* Dashboard Sections with Checkboxes */}
         <div
           style={{
             display: "grid",
-            gridTemplateColumns: "repeat(auto-fit, minmax(350px, 1fr))",
+            gridTemplateColumns: window.innerWidth >= 1024 ? "2fr 1fr" : "1fr",
             gap: "2rem",
           }}
         >
-          {/* Today's Focus */}
-          <div style={styles.statsCard}>
-            <h3 style={styles.cardTitle}>Today's Focus 🎯</h3>
-            <div
-              style={{ display: "flex", flexDirection: "column", gap: "1rem" }}
-            >
-              {[
-                "Finish UI updates for project dashboard",
-                "Prepare report for client review",
-                "Team check-in at 2:00 PM",
-              ].map((task, i) => (
-                <label
-                  key={i}
+          {/* Main Content Column */}
+          <div
+            style={{ display: "flex", flexDirection: "column", gap: "2rem" }}
+          >
+            {/* Wellbeing Score */}
+            <div style={styles.statsCard}>
+              <div
+                style={{
+                  display: "flex",
+                  alignItems: "center",
+                  justifyContent: "space-between",
+                  marginBottom: "1.5rem",
+                }}
+              >
+                <h2 style={styles.cardTitle}>Today's Wellbeing Score</h2>
+                <span
                   style={{
+                    fontSize: "2.5rem",
+                    fontWeight: "900",
+                    color: "#667eea",
+                  }}
+                >
+                  {wellbeingScore}
+                </span>
+              </div>
+              <div style={styles.progressBarContainer}>
+                <div
+                  style={{
+                    ...styles.progressBarFill,
+                    width: `${wellbeingScore}%`,
+                  }}
+                />
+              </div>
+              <p
+                style={{
+                  fontSize: "0.95rem",
+                  color: "#6b7280",
+                  lineHeight: "1.6",
+                }}
+              >
+                You're doing okay, but watch your evening work hours. I've
+                scheduled buffer time between meetings.
+              </p>
+            </div>
+
+            {/* Tasks */}
+            <div style={styles.statsCard}>
+              <div
+                style={{
+                  display: "flex",
+                  alignItems: "center",
+                  justifyContent: "space-between",
+                  marginBottom: "1.5rem",
+                }}
+              >
+                <h2 style={styles.cardTitle}>Today's Focus 🎯</h2>
+                <div style={{ display: "flex", gap: "0.5rem" }}>
+                  <button
+                    style={{
+                      padding: "0.5rem 1rem",
+                      borderRadius: "10px",
+                      fontSize: "0.9rem",
+                      border: "none",
+                      cursor: "pointer",
+                      fontWeight: "600",
+                      background: activeTab === "today" ? "#667eea" : "#e5e7eb",
+                      color: activeTab === "today" ? "white" : "#6b7280",
+                    }}
+                    onClick={() => setActiveTab("today")}
+                  >
+                    Today
+                  </button>
+                  <button
+                    style={{
+                      padding: "0.5rem 1rem",
+                      borderRadius: "10px",
+                      fontSize: "0.9rem",
+                      border: "none",
+                      cursor: "pointer",
+                      fontWeight: "600",
+                      background: activeTab === "week" ? "#667eea" : "#e5e7eb",
+                      color: activeTab === "week" ? "white" : "#6b7280",
+                    }}
+                    onClick={() => setActiveTab("week")}
+                  >
+                    Week
+                  </button>
+                </div>
+              </div>
+
+              <div
+                style={{
+                  display: "flex",
+                  flexDirection: "column",
+                  gap: "1rem",
+                }}
+              >
+                {tasks.map((task) => (
+                  <div
+                    key={task.id}
+                    style={{
+                      background: "rgba(102, 126, 234, 0.05)",
+                      borderRadius: "15px",
+                      padding: "1.25rem",
+                      border: "2px solid rgba(102, 126, 234, 0.1)",
+                      cursor: "pointer",
+                      transition: "all 0.3s ease",
+                    }}
+                  >
+                    <div
+                      style={{
+                        display: "flex",
+                        alignItems: "flex-start",
+                        justifyContent: "space-between",
+                      }}
+                    >
+                      <div
+                        style={{
+                          display: "flex",
+                          alignItems: "flex-start",
+                          gap: "1rem",
+                          flex: 1,
+                        }}
+                      >
+                        <input
+                          type="checkbox"
+                          style={{
+                            width: "20px",
+                            height: "20px",
+                            marginTop: "2px",
+                            cursor: "pointer",
+                            accentColor: "#667eea",
+                          }}
+                          checked={completedTasks.includes(task.id)}
+                          onChange={() => toggleTask(task.id)}
+                        />
+                        <div style={{ flex: 1 }}>
+                          <div
+                            style={{
+                              display: "flex",
+                              alignItems: "center",
+                              gap: "0.75rem",
+                              flexWrap: "wrap",
+                            }}
+                          >
+                            <h3
+                              style={{
+                                fontWeight: "600",
+                                color: completedTasks.includes(task.id)
+                                  ? "#9ca3af"
+                                  : "#1f2937",
+                                textDecoration: completedTasks.includes(task.id)
+                                  ? "line-through"
+                                  : "none",
+                              }}
+                            >
+                              {task.title}
+                            </h3>
+                            {task.priority === "urgent" && (
+                              <span
+                                style={{
+                                  padding: "0.25rem 0.75rem",
+                                  background: "rgba(239, 68, 68, 0.2)",
+                                  color: "#ef4444",
+                                  fontSize: "0.75rem",
+                                  borderRadius: "999px",
+                                  fontWeight: "600",
+                                }}
+                              >
+                                Urgent
+                              </span>
+                            )}
+                            {task.priority === "high" && (
+                              <span
+                                style={{
+                                  padding: "0.25rem 0.75rem",
+                                  background: "rgba(249, 115, 22, 0.2)",
+                                  color: "#f97316",
+                                  fontSize: "0.75rem",
+                                  borderRadius: "999px",
+                                  fontWeight: "600",
+                                }}
+                              >
+                                High
+                              </span>
+                            )}
+                          </div>
+                          <div
+                            style={{
+                              display: "flex",
+                              alignItems: "center",
+                              gap: "1rem",
+                              marginTop: "0.75rem",
+                              fontSize: "0.85rem",
+                              color: "#6b7280",
+                              flexWrap: "wrap",
+                            }}
+                          >
+                            <span
+                              style={{
+                                display: "flex",
+                                alignItems: "center",
+                                gap: "0.25rem",
+                              }}
+                            >
+                              <Clock
+                                style={{ width: "16px", height: "16px" }}
+                              />
+                              {task.time}
+                            </span>
+                            <span
+                              style={{
+                                display: "flex",
+                                alignItems: "center",
+                                gap: "0.25rem",
+                              }}
+                            >
+                              {task.source === "github" ? (
+                                <GitBranch
+                                  style={{ width: "16px", height: "16px" }}
+                                />
+                              ) : (
+                                <MessageSquare
+                                  style={{ width: "16px", height: "16px" }}
+                                />
+                              )}
+                              {task.source}
+                            </span>
+                            {task.energy === "high" && (
+                              <span
+                                style={{
+                                  display: "flex",
+                                  alignItems: "center",
+                                  gap: "0.25rem",
+                                  color: "#f59e0b",
+                                }}
+                              >
+                                <Zap
+                                  style={{ width: "16px", height: "16px" }}
+                                />
+                                Peak focus time
+                              </span>
+                            )}
+                          </div>
+                        </div>
+                      </div>
+                      <ChevronRight
+                        style={{
+                          width: "20px",
+                          height: "20px",
+                          color: "#9ca3af",
+                          flexShrink: 0,
+                        }}
+                      />
+                    </div>
+                  </div>
+                ))}
+              </div>
+
+              <div
+                style={{
+                  marginTop: "1.5rem",
+                  paddingTop: "1.5rem",
+                  borderTop: "2px solid #e5e7eb",
+                }}
+              >
+                <p
+                  style={{
+                    fontSize: "0.9rem",
+                    color: "#6b7280",
+                    lineHeight: "1.6",
+                  }}
+                >
+                  💡 I scheduled your production bug during your peak focus time
+                  (9-11am) and batched code reviews for the afternoon.
+                </p>
+              </div>
+            </div>
+
+            {/* Meetings */}
+            <div style={styles.statsCard}>
+              <h2 style={styles.cardTitle}>Meetings Today 📅</h2>
+              <div
+                style={{
+                  display: "flex",
+                  flexDirection: "column",
+                  gap: "1rem",
+                }}
+              >
+                {meetings.map((meeting) => (
+                  <div
+                    key={meeting.id}
+                    style={{
+                      background: "rgba(102, 126, 234, 0.05)",
+                      borderRadius: "15px",
+                      padding: "1.25rem",
+                      border: "2px solid rgba(102, 126, 234, 0.1)",
+                    }}
+                  >
+                    <div
+                      style={{
+                        display: "flex",
+                        alignItems: "flex-start",
+                        justifyContent: "space-between",
+                      }}
+                    >
+                      <div
+                        style={{
+                          display: "flex",
+                          alignItems: "flex-start",
+                          gap: "1rem",
+                          flex: 1,
+                        }}
+                      >
+                        <input
+                          type="checkbox"
+                          style={{
+                            width: "20px",
+                            height: "20px",
+                            marginTop: "2px",
+                            cursor: "pointer",
+                            accentColor: "#667eea",
+                          }}
+                          checked={completedMeetings.includes(meeting.id)}
+                          onChange={() => toggleMeeting(meeting.id)}
+                        />
+                        <div>
+                          <h3
+                            style={{
+                              fontWeight: "600",
+                              color: completedMeetings.includes(meeting.id)
+                                ? "#9ca3af"
+                                : "#1f2937",
+                              textDecoration: completedMeetings.includes(
+                                meeting.id
+                              )
+                                ? "line-through"
+                                : "none",
+                            }}
+                          >
+                            {meeting.title}
+                          </h3>
+                          <p
+                            style={{
+                              fontSize: "0.9rem",
+                              color: "#6b7280",
+                              marginTop: "0.25rem",
+                            }}
+                          >
+                            {meeting.time}
+                          </p>
+                          {meeting.suggestion && (
+                            <p
+                              style={{
+                                fontSize: "0.9rem",
+                                color: "#667eea",
+                                marginTop: "0.5rem",
+                                fontWeight: "500",
+                              }}
+                            >
+                              {meeting.suggestion}
+                            </p>
+                          )}
+                        </div>
+                      </div>
+                      {meeting.skippable && (
+                        <button
+                          style={{
+                            padding: "0.5rem 1rem",
+                            background: "#e5e7eb",
+                            color: "#374151",
+                            fontSize: "0.85rem",
+                            borderRadius: "8px",
+                            border: "none",
+                            cursor: "pointer",
+                            fontWeight: "600",
+                            flexShrink: 0,
+                          }}
+                        >
+                          Make Async
+                        </button>
+                      )}
+                    </div>
+                  </div>
+                ))}
+              </div>
+            </div>
+          </div>
+
+          {/* Sidebar */}
+          <div
+            style={{ display: "flex", flexDirection: "column", gap: "2rem" }}
+          >
+            {/* Quick Actions */}
+            <div style={styles.statsCard}>
+              <h2 style={{ ...styles.cardTitle, fontSize: "1.25rem" }}>
+                Quick Actions ⚡
+              </h2>
+              <div
+                style={{
+                  display: "flex",
+                  flexDirection: "column",
+                  gap: "0.75rem",
+                }}
+              >
+                <button
+                  style={{
+                    width: "100%",
                     display: "flex",
                     alignItems: "center",
                     gap: "0.75rem",
+                    padding: "1rem",
+                    background: "#667eea",
+                    color: "white",
+                    borderRadius: "12px",
+                    border: "none",
                     cursor: "pointer",
+                    fontWeight: "600",
+                    transition: "all 0.3s ease",
                   }}
                 >
-                  <input
-                    type="checkbox"
-                    checked={tasksCompleted[i]}
-                    onChange={() => {
-                      const newTasks = [...tasksCompleted];
-                      newTasks[i] = !newTasks[i];
-                      setTasksCompleted(newTasks);
-                    }}
-                    style={{ width: "18px", height: "18px", cursor: "pointer" }}
-                  />
-                  <span
-                    style={{
-                      textDecoration: tasksCompleted[i]
-                        ? "line-through"
-                        : "none",
-                      color: tasksCompleted[i] ? "#9ca3af" : "#374151",
-                    }}
-                  >
-                    {task}
-                  </span>
-                </label>
-              ))}
-            </div>
-          </div>
-
-          {/* Meetings */}
-          <div style={styles.statsCard}>
-            <h3 style={styles.cardTitle}>Meetings Today 📅</h3>
-            <div
-              style={{ display: "flex", flexDirection: "column", gap: "1rem" }}
-            >
-              {[
-                "10:00 AM - Design Sync with UI Team",
-                "2:00 PM - Weekly Standup",
-                "4:30 PM - Client Review Call",
-              ].map((meeting, i) => (
-                <label
-                  key={i}
+                  <Coffee style={{ width: "20px", height: "20px" }} />
+                  <span>Take a 15min break</span>
+                </button>
+                <button
                   style={{
+                    width: "100%",
                     display: "flex",
                     alignItems: "center",
                     gap: "0.75rem",
+                    padding: "1rem",
+                    background: "#e5e7eb",
+                    color: "#374151",
+                    borderRadius: "12px",
+                    border: "none",
+                    cursor: "pointer",
+                    fontWeight: "600",
+                    transition: "all 0.3s ease",
+                  }}
+                >
+                  <Zap style={{ width: "20px", height: "20px" }} />
+                  <span>Block focus time</span>
+                </button>
+                <button
+                  style={{
+                    width: "100%",
+                    display: "flex",
+                    alignItems: "center",
+                    gap: "0.75rem",
+                    padding: "1rem",
+                    background: "#e5e7eb",
+                    color: "#374151",
+                    borderRadius: "12px",
+                    border: "none",
+                    cursor: "pointer",
+                    fontWeight: "600",
+                    transition: "all 0.3s ease",
+                  }}
+                >
+                  <Moon style={{ width: "20px", height: "20px" }} />
+                  <span>End day early</span>
+                </button>
+              </div>
+            </div>
+
+            {/* Insights */}
+            <div style={styles.statsCard}>
+              <h2 style={{ ...styles.cardTitle, fontSize: "1.25rem" }}>
+                Weekly Insights 📊
+              </h2>
+              <div
+                style={{
+                  display: "flex",
+                  flexDirection: "column",
+                  gap: "1rem",
+                }}
+              >
+                {insights.map((insight, idx) => (
+                  <div
+                    key={idx}
+                    style={{
+                      display: "flex",
+                      alignItems: "flex-start",
+                      gap: "0.75rem",
+                      padding: "1rem",
+                      background: "rgba(102, 126, 234, 0.05)",
+                      borderRadius: "12px",
+                    }}
+                  >
+                    <insight.icon
+                      style={{
+                        width: "20px",
+                        height: "20px",
+                        flexShrink: 0,
+                        color:
+                          insight.type === "warning"
+                            ? "#f59e0b"
+                            : insight.type === "positive"
+                            ? "#10b981"
+                            : "#667eea",
+                      }}
+                    />
+                    <p
+                      style={{
+                        fontSize: "0.9rem",
+                        color: "#374151",
+                        lineHeight: "1.5",
+                      }}
+                    >
+                      {insight.text}
+                    </p>
+                  </div>
+                ))}
+              </div>
+            </div>
+
+            {/* Ask DevWell */}
+            <div style={styles.statsCard}>
+              <h2 style={{ ...styles.cardTitle, fontSize: "1.25rem" }}>
+                Ask DevWell 💬
+              </h2>
+              <div
+                style={{
+                  display: "flex",
+                  flexDirection: "column",
+                  gap: "0.75rem",
+                }}
+              >
+                <div
+                  style={{
+                    background: "rgba(102, 126, 234, 0.05)",
+                    borderRadius: "12px",
+                    padding: "1rem",
                     cursor: "pointer",
                   }}
                 >
-                  <input
-                    type="checkbox"
-                    checked={meetingsCompleted[i]}
-                    onChange={() => {
-                      const newMeetings = [...meetingsCompleted];
-                      newMeetings[i] = !newMeetings[i];
-                      setMeetingsCompleted(newMeetings);
-                    }}
-                    style={{ width: "18px", height: "18px", cursor: "pointer" }}
-                  />
-                  <span
-                    style={{
-                      textDecoration: meetingsCompleted[i]
-                        ? "line-through"
-                        : "none",
-                      color: meetingsCompleted[i] ? "#9ca3af" : "#374151",
-                    }}
-                  >
-                    {meeting}
-                  </span>
-                </label>
-              ))}
+                  <p style={{ fontSize: "0.9rem", color: "#374151" }}>
+                    "What should I work on next?"
+                  </p>
+                </div>
+                <div
+                  style={{
+                    background: "rgba(102, 126, 234, 0.05)",
+                    borderRadius: "12px",
+                    padding: "1rem",
+                    cursor: "pointer",
+                  }}
+                >
+                  <p style={{ fontSize: "0.9rem", color: "#374151" }}>
+                    "How am I doing this week?"
+                  </p>
+                </div>
+                <div
+                  style={{
+                    background: "rgba(102, 126, 234, 0.05)",
+                    borderRadius: "12px",
+                    padding: "1rem",
+                    cursor: "pointer",
+                  }}
+                >
+                  <p style={{ fontSize: "0.9rem", color: "#374151" }}>
+                    "Block my afternoon for coding"
+                  </p>
+                </div>
+                <input
+                  type="text"
+                  placeholder="Ask me anything..."
+                  style={{
+                    ...styles.input,
+                    marginTop: "0.5rem",
+                  }}
+                />
+              </div>
             </div>
-          </div>
-
-          {/* Quick Actions */}
-          <div style={styles.statsCard}>
-            <h3 style={styles.cardTitle}>Quick Actions ⚡</h3>
-            <div
-              style={{ display: "flex", flexDirection: "column", gap: "1rem" }}
-            >
-              <button style={styles.button}>Create New Task</button>
-              <button style={styles.button}>Schedule Meeting</button>
-              <button style={styles.button}>View Reports</button>
-            </div>
-          </div>
-
-          {/* Ask Devbeing */}
-          <div style={styles.statsCard}>
-            <h3 style={styles.cardTitle}>Ask Devbeing 💬</h3>
-            <p style={{ color: "#374151", marginBottom: "1rem" }}>
-              Have a question or need help with your code? Ask Devbeing for
-              instant guidance.
-            </p>
-            <input
-              type="text"
-              placeholder="Type your question here..."
-              style={{
-                ...styles.input,
-                marginBottom: "1rem",
-                borderRadius: "10px",
-              }}
-            />
-            <button style={styles.button}>Ask Now</button>
           </div>
         </div>
       </main>
