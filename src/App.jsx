@@ -16,6 +16,7 @@ import {
   Settings,
   Home,
 } from "lucide-react";
+
 // Enhanced Styles
 const styles = {
   gradientPurple: {
@@ -784,7 +785,6 @@ function GetStartedPage({ onNavigate, integrations, userName }) {
 }
 
 // Enhanced Home Page
-
 function HomePage({ onNavigate, userName }) {
   const [activeTab, setActiveTab] = useState("today");
   const [showAlert, setShowAlert] = useState(true);
