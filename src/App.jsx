@@ -9,12 +9,18 @@ import {
   Mail,
   CheckCircle,
   X,
+  Users,
+  LogIn,
+  UserPlus,
+  Github,
+  Star,
   ChevronRight,
   Coffee,
   Moon,
   Zap,
   Settings,
   Home,
+  Sparkles,
 } from "lucide-react";
 
 // Enhanced Styles
