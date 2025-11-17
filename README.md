@@ -1,297 +1,237 @@
-# 🚀 Productivity Dashboard
+# 🚀 DevWell Dashboard
+
+A modern productivity dashboard that integrates with GitHub and Slack to provide personalized insights and task management.
 
 <div align="center">
 
-![React](https://img.shields.io/badge/React-20232A?style=for-the-badge&logo=react&logoColor=61DAFB)
-![JavaScript](https://img.shields.io/badge/JavaScript-F7DF1E?style=for-the-badge&logo=javascript&logoColor=black)
-![Lucide Icons](https://img.shields.io/badge/Lucide-Icons-orange?style=for-the-badge)
+![React](https://img.shields.io/badge/React-19.1.1-61DAFB?style=for-the-badge&logo=react)
+![Express](https://img.shields.io/badge/Express-4.21.1-000000?style=for-the-badge&logo=express)
+![Vite](https://img.shields.io/badge/Vite-7.1.7-646CFF?style=for-the-badge&logo=vite)
 
-**Transform Your Productivity Today** ✨
-
-A beautiful, modern productivity dashboard that connects all your favorite tools in one powerful interface.
-
-[Live Demo](#) • [Features](#-features) • [Installation](#-installation) • [Usage](#-usage)
+**Connect your GitHub account and transform your productivity** ✨
 
 </div>
 
 ---
 
-## 📋 Table of Contents
-
-- [Overview](#-overview)
-- [Features](#-features)
-- [Screenshots](#-screenshots)
-- [Installation](#-installation)
-- [Usage](#-usage)
-- [Project Structure](#-project-structure)
-- [Technologies Used](#-technologies-used)
-- [Customization](#-customization)
-- [Contributing](#-contributing)
-- [License](#-license)
-
----
-
-## 🌟 Overview
-
-The **Productivity Dashboard** is a sleek, single-page React application designed to help you manage your workflow efficiently. With stunning gradient backgrounds, smooth animations, and intuitive UI components, this dashboard provides:
-
-- 🎨 **Beautiful Design** - Modern gradients and glassmorphism effects
-- 🔗 **Integration Support** - Connect GitHub, Slack, and Gmail
-- 📊 **Performance Tracking** - Monitor your projects, tasks, and achievements
-- ⚡ **Lightning Fast** - Built with React hooks for optimal performance
-- 📱 **Responsive Layout** - Works seamlessly on all devices
-
----
-
 ## ✨ Features
 
-### 🏠 Landing Page
-
-- Eye-catching hero section with animated floating shapes
-- Key statistics (10K+ Users, 5-Star Rated, Free Forever)
-- Call-to-action button with hover effects
-
-### 🔐 Authentication
-
-- Dual-mode authentication (Login/Signup)
-- Smooth tab transitions
-- Form validation ready
-- Beautiful glassmorphism card design
-
-### 🔌 Integration Setup
-
-- Visual integration cards for GitHub, Slack, and Gmail
-- One-click connection toggle
-- Connection status indicators
-- Personalized welcome message
-
-### 📊 Dashboard
-
-- **Performance Overview** - Track projects, tasks, and completed items
-- **Real-time Activity Feed** - Monitor recent actions and updates
-- **Achievement Cards** - Celebrate milestones and productivity boosts
-- **Interactive Stats** - Hover effects and smooth animations
+- 🔐 **GitHub OAuth Integration** - Secure login with your GitHub account
+- 📊 **Real-time Dashboard** - View your repositories, commits, and activity
+- 🎯 **Personalized Insights** - AI-driven recommendations based on your GitHub activity
+- 📝 **Task Management** - Tasks generated from your actual GitHub events
+- 🎨 **Modern UI** - Beautiful gradient design with smooth animations
+- ⚡ **Fast Performance** - Built with React and Vite for optimal speed
 
 ---
 
-## 📸 Screenshots
-
-### Landing Page
-
-Beautiful gradient background with floating animations and compelling call-to-action.
-
-### Authentication
-
-Clean, modern login/signup interface with smooth transitions.
-
-### Dashboard
-
-Comprehensive overview with stats, activity feed, and achievement highlights.
-
----
-
-## 🚀 Installation
+## 🚀 Quick Start
 
 ### Prerequisites
 
-- Node.js (v14 or higher)
+- Node.js (v18 or higher)
 - npm or yarn
+- GitHub OAuth App (for authentication)
 
-### Steps
+### Installation
 
 1. **Clone the repository**
 
 ```bash
-git clone https://github.com/yourusername/productivity-dashboard.git
-cd productivity-dashboard
+git clone <your-repo-url>
+cd Devbeing_project
 ```
 
 2. **Install dependencies**
 
 ```bash
 npm install
-# or
-yarn install
 ```
 
-3. **Install Lucide React icons**
+3. **Set up environment variables**
 
 ```bash
-npm install lucide-react
-# or
-yarn add lucide-react
+cp .env.example .env
 ```
 
-4. **Start the development server**
+4. **Configure your `.env` file**
 
+Open `.env` and fill in your OAuth credentials:
+
+```env
+# GitHub OAuth (Required)
+GITHUB_CLIENT_ID=your_github_client_id
+GITHUB_CLIENT_SECRET=your_github_client_secret
+GITHUB_REDIRECT_URL=http://localhost:5173/api/auth/github/callback
+
+# JWT (Required)
+JWT_SECRET=your_secure_random_string
+
+# Server Configuration (Optional)
+PORT=3000
+FRONTEND_URL=http://localhost:5173
+```
+
+5. **Start the development servers**
+
+**Terminal 1 - Backend:**
 ```bash
-npm start
-# or
-yarn start
+npm run dev:server
 ```
 
-5. **Open your browser**
+**Terminal 2 - Frontend:**
+```bash
+npm run dev
+```
 
-```
-Navigate to http://localhost:3000
-```
+6. **Open your browser**
+
+Navigate to: `http://localhost:5173`
 
 ---
 
-## 💻 Usage
+## 🔧 GitHub OAuth Setup
 
-### Basic Navigation
+To enable GitHub authentication, you need to create a GitHub OAuth App:
 
-1. **Start on Landing Page** - Click "Get Started Free" to begin
-2. **Authentication** - Sign up or log in (demo mode - no validation required)
-3. **Connect Integrations** - Toggle connections for GitHub, Slack, and Gmail
-4. **Access Dashboard** - View your productivity stats and recent activity
+1. Go to [GitHub Settings > Developer settings > OAuth Apps](https://github.com/settings/developers)
+2. Click "New OAuth App"
+3. Fill in:
+   - **Application name**: Your app name
+   - **Homepage URL**: `http://localhost:5173`
+   - **Authorization callback URL**: `http://localhost:5173/api/auth/github/callback`
+4. Click "Register application"
+5. Copy the **Client ID** and **Client Secret**
+6. Add them to your `.env` file
 
-### Navigation Flow
-
-```
-Landing Page → Auth Page → Get Started → Dashboard
-     ↑                                         ↓
-     └─────────────── Logout ─────────────────┘
-```
+**Required Scopes:**
+- `repo` - Access repositories
+- `read:user` - Read user profile
+- `user:email` - Read user email
 
 ---
 
 ## 📁 Project Structure
 
 ```
-productivity-dashboard/
-│
-├── src/
-│   ├── App.js                 # Main application component
-│   └── index.js               # Entry point
-│
-├── public/
-│   └── index.html             # HTML template
-│
-├── package.json               # Dependencies and scripts
-└── README.md                  # Project documentation
-```
-
-### Component Breakdown
-
-- **Router** - Manages page navigation and state
-- **LandingPage** - Hero section with CTA
-- **AuthPage** - Login/Signup form with validation
-- **GetStartedPage** - Integration connection interface
-- **HomePage** - Main dashboard with stats and activity
-
----
-
-## 🛠️ Technologies Used
-
-| Technology               | Purpose                                 |
-| ------------------------ | --------------------------------------- |
-| **React**                | UI framework and component architecture |
-| **React Hooks**          | State management (useState)             |
-| **Lucide React**         | Beautiful, consistent icon set          |
-| **CSS-in-JS**            | Inline styling with dynamic effects     |
-| **Gradient Backgrounds** | Modern, vibrant design aesthetics       |
-
----
-
-## 🎨 Customization
-
-### Changing Color Schemes
-
-Edit the gradient values in the `styles` object:
-
-```javascript
-gradientPurple: {
-  background: "linear-gradient(135deg, #667eea 0%, #764ba2 50%, #f093fb 100%)";
-}
-```
-
-### Adding New Integrations
-
-1. Add state in `App.js`:
-
-```javascript
-const [newTool, setNewTool] = useState(false);
-```
-
-2. Create IntegrationCard in GetStartedPage:
-
-```javascript
-<IntegrationCard
-  icon={YourIcon}
-  title="Tool Name"
-  connected={newTool}
-  onToggle={() => setNewTool(!newTool)}
-  color="#hexcolor"
-  gradient="linear-gradient(...)"
-/>
-```
-
-### Modifying Stats
-
-Update the stats array in `HomePage`:
-
-```javascript
-{
-  icon: YourIcon,
-  label: "Your Metric",
-  value: "42",
-  change: "+10 today",
-  gradient: "linear-gradient(...)",
-  color: "#hexcolor"
-}
+Devbeing_project/
+├── server/                 # Backend Express server
+│   ├── api/               # API routes
+│   │   ├── auth/         # Authentication routes
+│   │   └── github/        # GitHub insights
+│   ├── db/                # Database layer
+│   ├── lib/               # Utility libraries
+│   │   └── oauth/         # OAuth helpers
+│   └── middleware/        # Express middleware
+├── src/                   # Frontend React app
+│   ├── App.jsx           # Main app component
+│   ├── lib/              # Frontend utilities
+│   └── assets/           # Static assets
+├── public/               # Public assets
+├── .env.example          # Environment variables template
+├── package.json          # Dependencies
+└── vite.config.js        # Vite configuration
 ```
 
 ---
 
-## 🤝 Contributing
+## 🛠️ Available Scripts
 
-Contributions are welcome! Here's how you can help:
+- `npm run dev` - Start frontend development server (port 5173)
+- `npm run dev:server` - Start backend API server (port 3000)
+- `npm run dev:all` - Start both servers concurrently
+- `npm run build` - Build for production
+- `npm run preview` - Preview production build
 
-1. **Fork the repository**
-2. **Create a feature branch** (`git checkout -b feature/AmazingFeature`)
-3. **Commit your changes** (`git commit -m 'Add some AmazingFeature'`)
-4. **Push to the branch** (`git push origin feature/AmazingFeature`)
-5. **Open a Pull Request**
+---
 
-### Ideas for Contributions
+## 🔌 API Endpoints
 
-- 🔐 Add real authentication with Firebase/Auth0
-- 📱 Implement actual API integrations
-- 🌙 Add dark mode toggle
-- 📊 Create data visualization charts
-- 🔔 Add notification system
-- 💾 Implement local storage for persistence
+### Authentication
+- `GET /api/auth/github/login` - Initiate GitHub OAuth
+- `GET /api/auth/github/callback` - GitHub OAuth callback
+- `GET /api/auth/me` - Get current user profile
+
+### GitHub Data
+- `GET /api/github/insights` - Get personalized insights
+
+### Health Check
+- `GET /api/health` - Server health status
+
+---
+
+## 🔐 Environment Variables
+
+| Variable | Required | Description |
+|----------|----------|-------------|
+| `GITHUB_CLIENT_ID` | Yes | GitHub OAuth Client ID |
+| `GITHUB_CLIENT_SECRET` | Yes | GitHub OAuth Client Secret |
+| `GITHUB_REDIRECT_URL` | Yes | OAuth callback URL |
+| `JWT_SECRET` | Yes | Secret for JWT token signing |
+| `PORT` | No | Backend server port (default: 3000) |
+| `FRONTEND_URL` | No | Frontend URL (default: http://localhost:5173) |
+
+---
+
+## 📊 Dashboard Features
+
+### GitHub Profile
+- Display your GitHub username, avatar, and profile information
+- View your repositories with stars and forks
+- See recent commits from your active repositories
+- Track recent GitHub activity
+
+### Personalized Insights
+- Today's focus tasks based on your GitHub activity
+- Weekly highlights (commits, active repos, events)
+- Recommended tasks from your repositories
+- Wellbeing score calculated from your activity
+
+---
+
+## 🧪 Testing
+
+1. Start both servers (`npm run dev:server` and `npm run dev`)
+2. Visit `http://localhost:5173`
+3. Click "Continue with GitHub"
+4. Authorize the application
+5. You should be redirected to the dashboard with your GitHub data
+
+---
+
+## 🐛 Troubleshooting
+
+### OAuth Issues
+- **"Redirect URI mismatch"**: Ensure your GitHub OAuth App callback URL matches exactly: `http://localhost:5173/api/auth/github/callback`
+- **"CSRF validation failed"**: Clear cookies and try again
+- **"State cookie not found"**: Check that cookies are enabled in your browser
+
+### Server Issues
+- **Port 3000 already in use**: Change `PORT` in `.env` or kill the process using port 3000
+- **Port 5173 already in use**: Change Vite port in `vite.config.js`
+
+### Data Issues
+- **No repositories showing**: Ensure you granted `repo` scope during OAuth
+- **Empty dashboard**: Check that your GitHub account has activity
 
 ---
 
 ## 📝 License
 
-This project is licensed under the MIT License - see the [LICENSE](LICENSE) file for details.
+This project is licensed under the MIT License.
 
 ---
 
-## 🙏 Acknowledgments
+## 🤝 Contributing
 
-- **Lucide Icons** - For the beautiful icon set
-- **React Community** - For the amazing ecosystem
-- **You** - For checking out this project! ⭐
+Contributions are welcome! Please feel free to submit a Pull Request.
 
 ---
 
-## 📞 Contact
+## 📞 Support
 
-**Your Name** - [@yourtwitter](https://twitter.com/yourtwitter) - your.email@example.com
-
-Project Link: [https://github.com/yourusername/productivity-dashboard](https://github.com/yourusername/productivity-dashboard)
+For issues and questions, please open an issue on GitHub.
 
 ---
 
-<div align="center">
-
-### ⭐ Star this repo if you find it helpful!
-
-**Made with ❤️ and React**
-
-</div>
+**Made with ❤️ using React, Express, and Vite**
