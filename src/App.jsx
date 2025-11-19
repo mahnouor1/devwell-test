@@ -22,6 +22,9 @@ import {
   Home,
   Sparkles,
 } from "lucide-react";
+import RecentCommitsSidebar from "./RecentCommitsSidebar.jsx";
+import GitHubProfileCard from "./GitHubProfileCard.jsx";
+import DevWellChatbot from "./DevWellChatbot.jsx";
 
 // Enhanced Styles
 const styles = {
@@ -1148,74 +1151,34 @@ function HomePage({ onNavigate, userName }) {
 
       {/* Main Content */}
       <main
-        style={{ maxWidth: "80rem", margin: "0 auto", padding: "3rem 2rem" }}
+        style={{ 
+          maxWidth: "80rem", 
+          margin: "0 auto", 
+          padding: "3rem 2rem",
+          display: "flex",
+          gap: "2rem",
+        }}
       >
-        {/* GitHub User Info Card */}
-        {loading ? (
-          <div style={{ ...styles.statsCard, marginBottom: "2rem", textAlign: "center" }}>
-            <p style={{ color: "#6b7280" }}>Loading GitHub data...</p>
-          </div>
-        ) : error ? (
-          <div style={{ ...styles.statsCard, marginBottom: "2rem", textAlign: "center", background: "rgba(239, 68, 68, 0.1)" }}>
-            <p style={{ color: "#ef4444" }}>Error: {error}</p>
-          </div>
-        ) : githubData ? (
-          <div style={{ ...styles.statsCard, marginBottom: "2rem" }}>
-            <div style={{ display: "flex", alignItems: "center", gap: "1.5rem" }}>
-              {githubData.avatar_url && (
-                <img
-                  src={githubData.avatar_url}
-                  alt={githubData.name || githubData.login}
-                  style={{
-                    width: "80px",
-                    height: "80px",
-                    borderRadius: "50%",
-                    border: "3px solid #667eea",
-                  }}
-                />
-              )}
-              <div style={{ flex: 1 }}>
-                <h2 style={{ ...styles.cardTitle, fontSize: "1.5rem", marginBottom: "0.5rem" }}>
-                  GitHub Profile
-                </h2>
-                <div style={{ display: "flex", flexDirection: "column", gap: "0.5rem" }}>
-                  <div style={{ display: "flex", alignItems: "center", gap: "0.5rem" }}>
-                    <Github size={20} color="#667eea" />
-                    <span style={{ fontWeight: "600", color: "#1f2937" }}>
-                      {githubData.login}
-                    </span>
-                  </div>
-                  {githubData.name && (
-                    <p style={{ color: "#6b7280", margin: 0 }}>
-                      {githubData.name}
-                    </p>
-                  )}
-                  {githubData.email && (
-                    <p style={{ color: "#6b7280", margin: 0 }}>
-                      📧 {githubData.email}
-                    </p>
-                  )}
-                  {githubData.bio && (
-                    <p style={{ color: "#6b7280", margin: "0.5rem 0 0 0", fontStyle: "italic" }}>
-                      {githubData.bio}
-                    </p>
-                  )}
-                  {githubData.company && (
-                    <p style={{ color: "#6b7280", margin: 0 }}>
-                      🏢 {githubData.company}
-                    </p>
-                  )}
-                  {githubData.location && (
-                    <p style={{ color: "#6b7280", margin: 0 }}>
-                      📍 {githubData.location}
-                    </p>
-                  )}
-                </div>
-              </div>
-            </div>
-          </div>
-        ) : null}
+        {/* Left Sidebar - GitHub Profile & Recent Commits */}
+        <aside
+          style={{
+            width: "280px",
+            flexShrink: 0,
+            position: "sticky",
+            top: "6rem",
+            alignSelf: "flex-start",
+            maxHeight: "calc(100vh - 8rem)",
+            overflowY: "auto",
+          }}
+        >
+          <GitHubProfileCard githubData={githubData} loading={loading} error={error} />
+          {githubData?.github_data?.commits && Object.keys(githubData.github_data.commits).length > 0 && (
+            <RecentCommitsSidebar commits={githubData.github_data.commits} />
+          )}
+        </aside>
 
+        {/* Main Content Area */}
+        <div style={{ flex: 1, minWidth: 0 }}>
         {/* Repositories Section */}
         {githubData?.github_data?.repos && githubData.github_data.repos.length > 0 && (
           <div style={{ ...styles.statsCard, marginBottom: "2rem" }}>
@@ -1261,40 +1224,6 @@ function HomePage({ onNavigate, userName }) {
                       {repo.forks_count || 0}
                     </span>
                   </div>
-                </div>
-              ))}
-            </div>
-          </div>
-        )}
-
-        {/* Recent Commits Section */}
-        {githubData?.github_data?.commits && Object.keys(githubData.github_data.commits).length > 0 && (
-          <div style={{ ...styles.statsCard, marginBottom: "2rem" }}>
-            <h2 style={styles.cardTitle}>Recent Commits</h2>
-            <div style={{ display: "flex", flexDirection: "column", gap: "0.75rem", marginTop: "1rem" }}>
-              {Object.entries(githubData.github_data.commits).slice(0, 3).map(([repoName, commits]) => (
-                <div key={repoName}>
-                  <h3 style={{ fontSize: "0.9rem", fontWeight: "600", color: "#667eea", marginBottom: "0.5rem" }}>
-                    {repoName}
-                  </h3>
-                  {Array.isArray(commits) && commits.slice(0, 3).map((commit, idx) => (
-                    <div
-                      key={idx}
-                      style={{
-                        background: "rgba(102, 126, 234, 0.05)",
-                        borderRadius: "8px",
-                        padding: "0.75rem",
-                        marginBottom: "0.5rem",
-                      }}
-                    >
-                      <p style={{ fontSize: "0.85rem", color: "#1f2937", marginBottom: "0.25rem" }}>
-                        {commit.commit?.message?.split('\n')[0] || 'No message'}
-                      </p>
-                      <p style={{ fontSize: "0.75rem", color: "#6b7280" }}>
-                        {commit.commit?.author?.date ? new Date(commit.commit.author.date).toLocaleDateString() : ''}
-                      </p>
-                    </div>
-                  ))}
                 </div>
               ))}
             </div>
@@ -1667,6 +1596,14 @@ function HomePage({ onNavigate, userName }) {
                 </div>
               )}
             </div>
+
+            {/* Ask DevWell - Moved to main content for more width */}
+            <div style={styles.statsCard}>
+              <h2 style={{ ...styles.cardTitle, fontSize: "1.25rem" }}>
+                Ask DevWell 💬
+              </h2>
+              <DevWellChatbot githubData={githubData} insights={insights} />
+            </div>
           </div>
 
           {/* Sidebar */}
@@ -1805,66 +1742,8 @@ function HomePage({ onNavigate, userName }) {
                 </div>
               )}
             </div>
-
-            {/* Ask DevWell */}
-            <div style={styles.statsCard}>
-              <h2 style={{ ...styles.cardTitle, fontSize: "1.25rem" }}>
-                Ask DevWell 💬
-              </h2>
-              <div
-                style={{
-                  display: "flex",
-                  flexDirection: "column",
-                  gap: "0.75rem",
-                }}
-              >
-                <div
-                  style={{
-                    background: "rgba(102, 126, 234, 0.05)",
-                    borderRadius: "12px",
-                    padding: "1rem",
-                    cursor: "pointer",
-                  }}
-                >
-                  <p style={{ fontSize: "0.9rem", color: "#374151" }}>
-                    "What should I work on next?"
-                  </p>
-                </div>
-                <div
-                  style={{
-                    background: "rgba(102, 126, 234, 0.05)",
-                    borderRadius: "12px",
-                    padding: "1rem",
-                    cursor: "pointer",
-                  }}
-                >
-                  <p style={{ fontSize: "0.9rem", color: "#374151" }}>
-                    "How am I doing this week?"
-                  </p>
-                </div>
-                <div
-                  style={{
-                    background: "rgba(102, 126, 234, 0.05)",
-                    borderRadius: "12px",
-                    padding: "1rem",
-                    cursor: "pointer",
-                  }}
-                >
-                  <p style={{ fontSize: "0.9rem", color: "#374151" }}>
-                    "Block my afternoon for coding"
-                  </p>
-                </div>
-                <input
-                  type="text"
-                  placeholder="Ask me anything..."
-                  style={{
-                    ...styles.input,
-                    marginTop: "0.5rem",
-                  }}
-                />
-              </div>
-            </div>
           </div>
+        </div>
         </div>
       </main>
     </div>

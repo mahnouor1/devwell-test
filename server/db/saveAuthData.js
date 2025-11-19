@@ -143,3 +143,5 @@ export async function getAllAuthData(provider) {
   return records.filter(record => record.provider === provider);
 }
 
+
+

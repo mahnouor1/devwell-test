@@ -26,7 +26,7 @@ app.use(cookieParser());
 
 // Logging middleware for debugging
 app.use((req, res, next) => {
-  if (req.path.startsWith('/api/auth')) {
+  if (req.path.startsWith('/api/auth') || req.path.startsWith('/api/chat')) {
     console.log(`[${req.method}] ${req.path}`, {
       query: req.query,
       cookies: Object.keys(req.cookies || {}),
@@ -43,6 +43,7 @@ import slackLoginRoute from './api/auth/slack/login.js';
 import slackCallbackRoute from './api/auth/slack/callback.js';
 import authMeRoute from './api/auth/me.js';
 import githubInsightsRoute from './api/github/insights.js';
+import chatRoute from './api/chat.js';
 
 // Auth routes - GitHub
 app.get('/api/auth/github/login', githubLoginRoute);
@@ -57,6 +58,9 @@ app.get('/api/auth/me', authMeRoute);
 
 // GitHub insights
 app.get('/api/github/insights', githubInsightsRoute);
+
+// Chat endpoint
+app.post('/api/chat', chatRoute);
 
 // Health check
 app.get('/api/health', (req, res) => {
