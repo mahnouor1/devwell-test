@@ -16,7 +16,15 @@ import { saveAuthData } from '../../../db/saveAuthData.js';
 export default async function githubCallback(req, res) {
   try {
     // Get frontend URL early (used in redirects and logging)
-    const frontendUrl = process.env.FRONTEND_URL || 'http://localhost:5173';
+    // For Vercel, use the deployment URL
+    const getFrontendUrl = () => {
+      if (process.env.VERCEL_URL) {
+        return `https://${process.env.VERCEL_URL}`;
+      }
+      return process.env.FRONTEND_URL || 'http://localhost:5173';
+    };
+    const frontendUrl = getFrontendUrl();
+    const isVercel = !!process.env.VERCEL;
     
     const { code, state } = req.query;
     const storedState = req.cookies?.oauth_state;
@@ -73,13 +81,13 @@ export default async function githubCallback(req, res) {
     console.log('[GitHub Callback] State validation successful ✓');
 
     // Clear state cookie (must match the same options used when setting it)
-    res.clearCookie('oauth_state', {
+    const clearCookieOptions = {
       httpOnly: true,
-      secure: false,
       sameSite: 'lax',
       path: '/',
-      domain: 'localhost',
-    });
+      ...(isVercel ? { secure: true } : { domain: 'localhost', secure: false }),
+    };
+    res.clearCookie('oauth_state', clearCookieOptions);
     
     console.log('[GitHub Callback] State cookie cleared after successful validation');
 
@@ -219,14 +227,17 @@ export default async function githubCallback(req, res) {
     });
 
     // Set session cookie (must match cookie settings)
-    res.cookie('session_token', sessionToken, {
+    const cookieOptions = {
       httpOnly: true,
-      secure: false, // false for localhost
       sameSite: 'lax',
       path: '/',
-      domain: 'localhost',
       maxAge: 7 * 24 * 60 * 60 * 1000, // 7 days
-    });
+      // Domain: only set for localhost, not for Vercel
+      ...(isVercel ? {} : { domain: 'localhost', secure: false }),
+      // For Vercel (HTTPS), set secure flag
+      ...(isVercel ? { secure: true } : {}),
+    };
+    res.cookie('session_token', sessionToken, cookieOptions);
     
     console.log('[GitHub Callback] Session token created and cookie set ✓');
     console.log('[GitHub Callback] All data saved, redirecting to dashboard...');
