@@ -4,6 +4,16 @@ import react from '@vitejs/plugin-react'
 // https://vite.dev/config/
 export default defineConfig({
   plugins: [react()],
+  build: {
+    // Minimize use of eval in production
+    minify: 'esbuild',
+    rollupOptions: {
+      output: {
+        // Use function names instead of eval where possible
+        format: 'es',
+      },
+    },
+  },
   server: {
     port: 5173,
     proxy: {
