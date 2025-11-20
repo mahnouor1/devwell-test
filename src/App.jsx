@@ -301,8 +301,27 @@ function LandingPage({ onNavigate }) {
           }}
         >
           <button
-            onClick={() => {
-              window.location.href = '/api/auth/github/login';
+            onClick={async () => {
+              try {
+                console.log('[Login] Clicked - Initiating GitHub OAuth...');
+                // Test API connectivity first
+                try {
+                  const testRes = await fetch('/api/test', { 
+                    credentials: 'include',
+                    method: 'GET'
+                  });
+                  const testData = await testRes.json();
+                  console.log('[Login] API test result:', testData);
+                } catch (testErr) {
+                  console.warn('[Login] API test failed (continuing anyway):', testErr);
+                }
+                // Redirect to GitHub OAuth
+                console.log('[Login] Redirecting to /api/auth/github/login');
+                window.location.href = '/api/auth/github/login';
+              } catch (error) {
+                console.error('[Login] Error:', error);
+                alert('Failed to initiate login. Error: ' + error.message);
+              }
             }}
             style={{
               ...styles.button,
@@ -556,8 +575,27 @@ function AuthPage({ onNavigate, userAuth, userName }) {
           }}
         >
           <button
-            onClick={() => {
-              window.location.href = '/api/auth/github/login';
+            onClick={async () => {
+              try {
+                console.log('[Login] Clicked - Initiating GitHub OAuth...');
+                // Test API connectivity first
+                try {
+                  const testRes = await fetch('/api/test', { 
+                    credentials: 'include',
+                    method: 'GET'
+                  });
+                  const testData = await testRes.json();
+                  console.log('[Login] API test result:', testData);
+                } catch (testErr) {
+                  console.warn('[Login] API test failed (continuing anyway):', testErr);
+                }
+                // Redirect to GitHub OAuth
+                console.log('[Login] Redirecting to /api/auth/github/login');
+                window.location.href = '/api/auth/github/login';
+              } catch (error) {
+                console.error('[Login] Error:', error);
+                alert('Failed to initiate login. Error: ' + error.message);
+              }
             }}
             style={{
               width: "100%",

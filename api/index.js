@@ -58,15 +58,17 @@ app.use(cors({
 app.use(express.json());
 app.use(cookieParser());
 
-// Logging middleware for debugging
+// Logging middleware for debugging - log ALL requests
 app.use((req, res, next) => {
-  if (req.path.startsWith('/api/auth') || req.path.startsWith('/api/chat')) {
-    console.log(`[${req.method}] ${req.path}`, {
-      query: req.query,
-      cookies: Object.keys(req.cookies || {}),
-      hasCookieHeader: !!req.headers.cookie,
-    });
-  }
+  console.log(`[Vercel API] ${req.method} ${req.path}`, {
+    url: req.url,
+    originalUrl: req.originalUrl,
+    query: req.query,
+    cookies: Object.keys(req.cookies || {}),
+    hasCookieHeader: !!req.headers.cookie,
+    origin: req.headers.origin,
+    referer: req.headers.referer,
+  });
   next();
 });
 
@@ -113,6 +115,37 @@ app.get('/api/debug/cookies', (req, res) => {
   });
 });
 
+// Test route to verify API is working
+app.get('/api/test', (req, res) => {
+  res.json({ 
+    status: 'ok', 
+    message: 'API is working',
+    timestamp: new Date().toISOString(),
+    vercel: !!process.env.VERCEL,
+  });
+});
+
+// Error handling middleware
+app.use((err, req, res, next) => {
+  console.error('[Vercel API Error]', err);
+  res.status(err.status || 500).json({
+    error: err.message || 'Internal server error',
+    path: req.path,
+  });
+});
+
+// 404 handler for unmatched routes
+app.use((req, res) => {
+  console.warn(`[Vercel API] 404 - Route not found: ${req.method} ${req.path}`);
+  res.status(404).json({
+    error: 'Route not found',
+    path: req.path,
+    method: req.method,
+  });
+});
+
 // Export as Vercel serverless function
+// For Vercel, we can export the Express app directly
+// Vercel will automatically wrap it
 export default app;
 
