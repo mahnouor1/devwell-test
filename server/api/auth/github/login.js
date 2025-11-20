@@ -7,6 +7,44 @@ import crypto from 'crypto';
  */
 export default async function githubLogin(req, res) {
   try {
+    console.log('[GitHub Login] ========================================');
+    console.log('[GitHub Login] Request received:', {
+      method: req.method,
+      path: req.path,
+      url: req.url,
+      origin: req.headers.origin,
+      referer: req.headers.referer,
+    });
+    
+    // Check environment variables first
+    const clientId = process.env.GITHUB_CLIENT_ID;
+    const redirectUrl = process.env.GITHUB_REDIRECT_URL || process.env.GITHUB_REDIRECT_URI;
+    
+    console.log('[GitHub Login] Environment check:', {
+      hasClientId: !!clientId,
+      hasRedirectUrl: !!redirectUrl,
+      redirectUrl: redirectUrl,
+      vercel: !!process.env.VERCEL,
+    });
+    
+    if (!clientId) {
+      console.error('[GitHub Login] GITHUB_CLIENT_ID is missing!');
+      return res.status(500).json({
+        error: 'Configuration error',
+        message: 'GITHUB_CLIENT_ID is not set in environment variables',
+        details: 'Please set GITHUB_CLIENT_ID in Vercel environment variables',
+      });
+    }
+    
+    if (!redirectUrl) {
+      console.error('[GitHub Login] GITHUB_REDIRECT_URL is missing!');
+      return res.status(500).json({
+        error: 'Configuration error',
+        message: 'GITHUB_REDIRECT_URL is not set in environment variables',
+        details: 'Please set GITHUB_REDIRECT_URL in Vercel environment variables',
+      });
+    }
+    
     // Generate CSRF state token
     const state = crypto.randomBytes(32).toString('hex');
     
@@ -45,28 +83,38 @@ export default async function githubLogin(req, res) {
     }
     console.log('[GitHub Login] ========================================');
 
-    // Verify redirect URL is set
-    const redirectUrl = process.env.GITHUB_REDIRECT_URL || process.env.GITHUB_REDIRECT_URI;
-    if (!redirectUrl) {
-      throw new Error('GITHUB_REDIRECT_URL is not set in environment variables');
-    }
-    
-    console.log('[GitHub Login] Redirect URL configured:', redirectUrl);
-    console.log('[GitHub Login] Expected: http://localhost:5173/api/auth/github/callback');
-    
     // Generate GitHub authorization URL
-    const authUrl = getGitHubAuthUrl(state);
-    
-    console.log('[GitHub Login] Redirecting to GitHub OAuth:', authUrl.substring(0, 80) + '...');
+    let authUrl;
+    try {
+      authUrl = getGitHubAuthUrl(state);
+      console.log('[GitHub Login] Generated GitHub OAuth URL:', authUrl.substring(0, 100) + '...');
+    } catch (urlError) {
+      console.error('[GitHub Login] Error generating auth URL:', urlError);
+      return res.status(500).json({
+        error: 'Failed to generate OAuth URL',
+        message: urlError.message,
+      });
+    }
+
+    console.log('[GitHub Login] Redirecting to GitHub OAuth...');
+    console.log('[GitHub Login] ========================================');
 
     // Redirect to GitHub
-    res.redirect(authUrl);
+    res.redirect(302, authUrl);
   } catch (error) {
-    console.error('[GitHub Login] Error:', error.message);
-    res.status(500).json({
-      error: 'Failed to initiate GitHub OAuth',
-      message: error.message,
-    });
+    console.error('[GitHub Login] ========================================');
+    console.error('[GitHub Login] Unexpected error:', error);
+    console.error('[GitHub Login] Error stack:', error.stack);
+    console.error('[GitHub Login] ========================================');
+    
+    // Only send JSON if headers haven't been sent
+    if (!res.headersSent) {
+      res.status(500).json({
+        error: 'Failed to initiate GitHub OAuth',
+        message: error.message,
+        stack: process.env.NODE_ENV === 'development' ? error.stack : undefined,
+      });
+    }
   }
 }
 
