@@ -8,6 +8,7 @@ import {
 } from '../../../lib/oauth/github.js';
 import { signToken } from '../../../../src/lib/jwt/sign.js';
 import { saveAuthData } from '../../../db/saveAuthData.js';
+import jwt from 'jsonwebtoken';
 
 /**
  * GitHub OAuth callback route
@@ -26,8 +27,23 @@ export default async function githubCallback(req, res) {
     const frontendUrl = getFrontendUrl();
     const isVercel = !!process.env.VERCEL;
     
-    const { code, state } = req.query;
-    const storedState = req.cookies?.oauth_state;
+    const { code, state: signedState } = req.query;
+    
+    // Verify the signed state (no cookie needed!)
+    let decodedState = null;
+    if (signedState) {
+      try {
+        const jwtSecret = process.env.JWT_SECRET;
+        if (!jwtSecret) {
+          throw new Error('JWT_SECRET is not set');
+        }
+        decodedState = jwt.verify(signedState, jwtSecret);
+        console.log('[GitHub Callback] Signed state verified successfully ✓');
+      } catch (jwtError) {
+        console.error('[GitHub Callback] Failed to verify signed state:', jwtError.message);
+        decodedState = null;
+      }
+    }
 
     // Verify callback URL matches expected
     const expectedCallbackUrl = 'http://localhost:5173/api/auth/github/callback';
@@ -45,11 +61,9 @@ export default async function githubCallback(req, res) {
       referer: req.headers.referer,
       'user-agent': req.headers['user-agent']?.substring(0, 50),
     });
-    console.log('[GitHub Callback] Query parameters:', { code: code ? 'present' : 'missing', state: state ? 'present' : 'missing' });
-    console.log('[GitHub Callback] Received state from query:', state || 'MISSING');
-    console.log('[GitHub Callback] Received state (first 32 chars):', state ? state.substring(0, 32) : 'MISSING');
-    console.log('[GitHub Callback] Stored state from cookie:', storedState || 'MISSING');
-    console.log('[GitHub Callback] Stored state (first 32 chars):', storedState ? storedState.substring(0, 32) : 'MISSING');
+    console.log('[GitHub Callback] Query parameters:', { code: code ? 'present' : 'missing', state: signedState ? 'present' : 'missing' });
+    console.log('[GitHub Callback] Received signed state from query:', signedState ? signedState.substring(0, 50) + '...' : 'MISSING');
+    console.log('[GitHub Callback] Decoded state:', decodedState ? 'valid' : 'invalid/missing');
     console.log('[GitHub Callback] All cookies:', req.cookies || {});
     console.log('[GitHub Callback] Cookie keys:', Object.keys(req.cookies || {}));
     console.log('[GitHub Callback] Cookie header present:', !!req.headers.cookie);
@@ -57,8 +71,8 @@ export default async function githubCallback(req, res) {
     console.log('[GitHub Callback] Is Vercel:', isVercel);
     console.log('[GitHub Callback] ========================================');
 
-    // Validate state parameter (CSRF protection)
-    if (!state) {
+    // Validate signed state parameter (CSRF protection)
+    if (!signedState) {
       console.error('[GitHub Callback] State missing from query parameters');
       return res.status(400).json({
         error: 'Invalid state parameter',
@@ -66,55 +80,16 @@ export default async function githubCallback(req, res) {
       });
     }
 
-    if (!storedState) {
-      console.error('[GitHub Callback] State cookie not found');
-      console.error('[GitHub Callback] This usually means:');
-      console.error('[GitHub Callback] 1. Cookie was not set during login');
-      console.error('[GitHub Callback] 2. Cookie domain/path/secure settings don\'t match');
-      console.error('[GitHub Callback] 3. Cookie expired (maxAge: 10 minutes)');
-      console.error('[GitHub Callback] 4. Browser blocked the cookie');
-      
-      // For debugging: allow proceeding if we're in development or if state is provided
-      // In production, this should still fail for security
-      if (process.env.NODE_ENV === 'development' || process.env.ALLOW_MISSING_STATE === 'true') {
-        console.warn('[GitHub Callback] WARNING: Proceeding without state validation (development mode)');
-      } else {
-        return res.status(400).json({
-          error: 'Invalid state parameter',
-          message: 'CSRF validation failed: state cookie not found',
-          details: 'The OAuth state cookie was not found. This may be due to cookie settings or browser blocking cookies.',
-          debug: {
-            hasStateInQuery: !!state,
-            cookiesReceived: Object.keys(req.cookies || {}),
-            cookieHeader: req.headers.cookie ? 'present' : 'missing',
-          },
-        });
-      }
-    }
-
-    if (state !== storedState) {
-      console.error('[GitHub Callback] State mismatch!');
-      console.error('[GitHub Callback] Query state:', state);
-      console.error('[GitHub Callback] Cookie state:', storedState);
+    if (!decodedState || !decodedState.state) {
+      console.error('[GitHub Callback] Invalid or expired signed state');
       return res.status(400).json({
         error: 'Invalid state parameter',
-        message: 'CSRF validation failed: state mismatch',
+        message: 'CSRF validation failed: state signature invalid or expired',
+        details: 'The OAuth state could not be verified. It may have expired (10 minute limit) or been tampered with.',
       });
     }
 
-    console.log('[GitHub Callback] State validation successful ✓');
-
-    // Clear state cookie (must match the same options used when setting it)
-    const clearCookieOptions = {
-      httpOnly: true,
-      sameSite: 'lax',
-      path: '/',
-      // Match the same options as when setting the cookie
-      ...(isVercel ? { secure: true } : { domain: 'localhost', secure: false }),
-    };
-    res.clearCookie('oauth_state', clearCookieOptions);
-    
-    console.log('[GitHub Callback] State cookie cleared after successful validation');
+    console.log('[GitHub Callback] State validation successful ✓ (signed state verified)');
 
     if (!code) {
       return res.status(400).json({
