@@ -56,16 +56,21 @@ export default async function githubLogin(req, res) {
     // For OAuth flow: GitHub redirects back, so cookie must survive
     // Cookie settings - MUST match exactly for OAuth redirects to work
     const isVercel = !!process.env.VERCEL;
+    
+    // For OAuth redirects, we need cookies to survive cross-site navigation
+    // sameSite: 'lax' works for top-level navigations (OAuth redirects are top-level)
+    // But we need to ensure secure is set correctly for HTTPS
     const cookieOptions = {
       httpOnly: true,
-      sameSite: 'lax',
+      sameSite: 'lax', // 'lax' allows cookies on top-level navigations (OAuth redirects)
       path: '/',
-      maxAge: 10 * 60 * 1000, // 10 minutes exactly as specified
-      // Domain: only set for localhost, not for Vercel (Vercel handles it automatically)
-      ...(isVercel ? {} : { domain: 'localhost', secure: false }),
-      // For Vercel (HTTPS), set secure flag
-      ...(isVercel ? { secure: true } : {}),
+      maxAge: 10 * 60 * 1000, // 10 minutes
+      // For Vercel (HTTPS), we need secure: true
+      // Don't set domain for Vercel - let it use the default (current domain)
+      ...(isVercel ? { secure: true } : { domain: 'localhost', secure: false }),
     };
+    
+    console.log('[GitHub Login] Cookie options for OAuth:', JSON.stringify(cookieOptions, null, 2));
     
     console.log('[GitHub Login] ========================================');
     console.log('[GitHub Login] Generated state:', state);
