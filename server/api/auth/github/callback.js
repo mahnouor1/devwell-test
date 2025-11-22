@@ -232,16 +232,25 @@ export default async function githubCallback(req, res) {
       sameSite: 'lax',
       path: '/',
       maxAge: 7 * 24 * 60 * 60 * 1000, // 7 days
-      // Domain: only set for localhost, not for Vercel
+      // Domain: only set for localhost, not for Vercel (Vercel handles it automatically)
       ...(isVercel ? {} : { domain: 'localhost', secure: false }),
       // For Vercel (HTTPS), set secure flag
       ...(isVercel ? { secure: true } : {}),
     };
     res.cookie('session_token', sessionToken, cookieOptions);
     
+    // Verify cookie was set
+    const setCookieHeader = res.getHeader('Set-Cookie');
+    console.log('[GitHub Callback] ========================================');
     console.log('[GitHub Callback] Session token created and cookie set ✓');
+    console.log('[GitHub Callback] Cookie options:', JSON.stringify(cookieOptions, null, 2));
+    console.log('[GitHub Callback] Set-Cookie header:', setCookieHeader ? 'Present' : 'Missing');
+    if (setCookieHeader) {
+      console.log('[GitHub Callback] Set-Cookie value:', Array.isArray(setCookieHeader) ? setCookieHeader[0] : setCookieHeader);
+    }
     console.log('[GitHub Callback] All data saved, redirecting to dashboard...');
     console.log('[GitHub Callback] Redirect URL:', `${frontendUrl}/dashboard?auth=success`);
+    console.log('[GitHub Callback] ========================================');
 
     // Redirect to dashboard/frontend ONLY AFTER all data is saved
     res.redirect(`${frontendUrl}/dashboard?auth=success`);
