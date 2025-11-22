@@ -11,16 +11,36 @@ const DB_FILE = join(DB_DIR, 'auth_data.json');
 
 // Try to import Vercel KV (only available on Vercel)
 let kv = null;
+let useInMemory = false;
 try {
   // @vercel/kv is only available in Vercel environment
   if (process.env.KV_REST_API_URL && process.env.KV_REST_API_TOKEN) {
     const kvModule = await import('@vercel/kv');
     kv = kvModule.kv;
+    console.log('[DB] Using Vercel KV for storage');
+  } else {
+    // No KV, use in-memory storage for Vercel (or file system for local)
+    if (process.env.VERCEL) {
+      useInMemory = true;
+      console.log('[DB] Vercel detected but KV not configured, using in-memory storage');
+      console.log('[DB] Note: Data will not persist across function invocations');
+      console.log('[DB] To persist data, set up Vercel KV: https://vercel.com/docs/storage/vercel-kv');
+    } else {
+      console.log('[DB] Using file system for local development');
+    }
   }
 } catch (error) {
-  // KV not available, will use file system
-  console.log('[DB] Vercel KV not available, using file system');
+  // KV not available
+  if (process.env.VERCEL) {
+    useInMemory = true;
+    console.log('[DB] Vercel KV import failed, using in-memory storage');
+  } else {
+    console.log('[DB] Vercel KV not available, using file system');
+  }
 }
+
+// In-memory storage for Vercel (fallback when KV is not available)
+let inMemoryDB = [];
 
 /**
  * Initialize database file if it doesn't exist (local only)
@@ -58,7 +78,12 @@ async function readDB() {
     }
   }
   
-  // Use file system
+  if (useInMemory) {
+    // Use in-memory storage (for Vercel without KV)
+    return inMemoryDB;
+  }
+  
+  // Use file system (local development)
   await initDB();
   try {
     const content = await readFile(DB_FILE, 'utf-8');
@@ -85,7 +110,13 @@ async function writeDB(data) {
     }
   }
   
-  // Use file system
+  if (useInMemory) {
+    // Use in-memory storage (for Vercel without KV)
+    inMemoryDB = data;
+    return;
+  }
+  
+  // Use file system (local development)
   await initDB();
   await writeFile(DB_FILE, JSON.stringify(data, null, 2), 'utf-8');
 }

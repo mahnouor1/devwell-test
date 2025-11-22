@@ -125,6 +125,22 @@ app.get('/api/test', (req, res) => {
   });
 });
 
+// Debug route to check environment variables (without exposing secrets)
+app.get('/api/debug/env', (req, res) => {
+  res.json({
+    hasGithubClientId: !!process.env.GITHUB_CLIENT_ID,
+    hasGithubClientSecret: !!process.env.GITHUB_CLIENT_SECRET,
+    hasGithubRedirectUrl: !!process.env.GITHUB_REDIRECT_URL,
+    githubRedirectUrl: process.env.GITHUB_REDIRECT_URL || 'NOT SET',
+    hasJwtSecret: !!process.env.JWT_SECRET,
+    hasFrontendUrl: !!process.env.FRONTEND_URL,
+    frontendUrl: process.env.FRONTEND_URL || 'NOT SET',
+    hasKv: !!(process.env.KV_REST_API_URL && process.env.KV_REST_API_TOKEN),
+    vercel: !!process.env.VERCEL,
+    vercelUrl: process.env.VERCEL_URL || 'NOT SET',
+  });
+});
+
 // Error handling middleware
 app.use((err, req, res, next) => {
   console.error('[Vercel API Error]', err);
