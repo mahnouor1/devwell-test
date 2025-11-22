@@ -301,46 +301,11 @@ function LandingPage({ onNavigate }) {
           }}
         >
           <button
-            onClick={async () => {
-              try {
-                console.log('[Login] Clicked - Initiating GitHub OAuth...');
-                // Check login endpoint response
-                console.log('[Login] Checking login endpoint...');
-                const loginCheck = await fetch('/api/auth/github/login', { 
-                  credentials: 'include',
-                  method: 'GET',
-                  redirect: 'manual' // Don't follow redirects automatically
-                });
-                
-                console.log('[Login] Login endpoint response:', {
-                  status: loginCheck.status,
-                  statusText: loginCheck.statusText,
-                  type: loginCheck.type,
-                });
-                
-                // If it's a redirect (3xx), follow it
-                if (loginCheck.status >= 300 && loginCheck.status < 400) {
-                  const redirectUrl = loginCheck.headers.get('Location');
-                  console.log('[Login] Redirect URL:', redirectUrl);
-                  if (redirectUrl) {
-                    window.location.href = redirectUrl;
-                  } else {
-                    window.location.href = '/api/auth/github/login';
-                  }
-                } else if (!loginCheck.ok) {
-                  // Error response
-                  const errorData = await loginCheck.json().catch(() => ({ error: 'Unknown error' }));
-                  console.error('[Login] Error response:', errorData);
-                  alert(`Login failed: ${errorData.message || errorData.error}\n\n${errorData.details || 'Check Vercel environment variables: GITHUB_CLIENT_ID, GITHUB_REDIRECT_URL'}`);
-                } else {
-                  // Fallback: try direct redirect
-                  window.location.href = '/api/auth/github/login';
-                }
-              } catch (error) {
-                console.error('[Login] Error:', error);
-                // Fallback: try direct redirect anyway
-                window.location.href = '/api/auth/github/login';
-              }
+            onClick={() => {
+              // Simply redirect to the login endpoint
+              // The backend will handle the redirect to GitHub
+              console.log('[Login] Redirecting to GitHub OAuth...');
+              window.location.href = '/api/auth/github/login';
             }}
             style={{
               ...styles.button,

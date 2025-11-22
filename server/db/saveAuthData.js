@@ -5,14 +5,29 @@ import { dirname, join } from 'path';
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = dirname(__filename);
 
-// Database file path (JSON file for now)
+// Database file path (JSON file for local development)
 const DB_DIR = join(__dirname, '../../data');
 const DB_FILE = join(DB_DIR, 'auth_data.json');
 
+// Try to import Vercel KV (only available on Vercel)
+let kv = null;
+try {
+  // @vercel/kv is only available in Vercel environment
+  if (process.env.KV_REST_API_URL && process.env.KV_REST_API_TOKEN) {
+    const kvModule = await import('@vercel/kv');
+    kv = kvModule.kv;
+  }
+} catch (error) {
+  // KV not available, will use file system
+  console.log('[DB] Vercel KV not available, using file system');
+}
+
 /**
- * Initialize database file if it doesn't exist
+ * Initialize database file if it doesn't exist (local only)
  */
 async function initDB() {
+  if (kv) return; // Skip for KV
+  
   try {
     await mkdir(DB_DIR, { recursive: true });
     try {
@@ -32,6 +47,18 @@ async function initDB() {
  * @returns {Promise<Array>} Array of auth records
  */
 async function readDB() {
+  if (kv) {
+    // Use Vercel KV
+    try {
+      const data = await kv.get('auth_data');
+      return data || [];
+    } catch (error) {
+      console.error('Error reading from KV:', error);
+      return [];
+    }
+  }
+  
+  // Use file system
   await initDB();
   try {
     const content = await readFile(DB_FILE, 'utf-8');
@@ -47,6 +74,18 @@ async function readDB() {
  * @param {Array} data - Array of auth records
  */
 async function writeDB(data) {
+  if (kv) {
+    // Use Vercel KV
+    try {
+      await kv.set('auth_data', data);
+      return;
+    } catch (error) {
+      console.error('Error writing to KV:', error);
+      throw error;
+    }
+  }
+  
+  // Use file system
   await initDB();
   await writeFile(DB_FILE, JSON.stringify(data, null, 2), 'utf-8');
 }
@@ -142,6 +181,3 @@ export async function getAllAuthData(provider) {
   const records = await readDB();
   return records.filter(record => record.provider === provider);
 }
-
-
-
