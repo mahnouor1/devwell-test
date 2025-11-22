@@ -36,7 +36,10 @@ export function getGitHubAuthUrl(state) {
 
   console.log('[GitHub OAuth] Using redirect URI:', redirectUrl);
   
-  return `https://github.com/login/oauth/authorize?client_id=${clientId}&scope=${scope}&redirect_uri=${redirectUri}&state=${state}`;
+  // URL encode the state parameter (JWT tokens contain special characters)
+  const encodedState = encodeURIComponent(state);
+  
+  return `https://github.com/login/oauth/authorize?client_id=${clientId}&scope=${scope}&redirect_uri=${redirectUri}&state=${encodedState}`;
 }
 
 /**

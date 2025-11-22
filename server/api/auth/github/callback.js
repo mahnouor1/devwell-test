@@ -27,20 +27,43 @@ export default async function githubCallback(req, res) {
     const frontendUrl = getFrontendUrl();
     const isVercel = !!process.env.VERCEL;
     
-    const { code, state: signedState } = req.query;
+    // Get state from query and decode it (it was URL encoded in the OAuth URL)
+    const { code, state: signedStateRaw } = req.query;
+    const signedState = signedStateRaw ? decodeURIComponent(signedStateRaw) : null;
     
     // Verify the signed state (no cookie needed!)
     let decodedState = null;
+    let jwtErrorDetails = null;
     if (signedState) {
       try {
         const jwtSecret = process.env.JWT_SECRET;
         if (!jwtSecret) {
-          throw new Error('JWT_SECRET is not set');
+          throw new Error('JWT_SECRET is not set in environment variables');
         }
+        console.log('[GitHub Callback] Verifying signed state...');
+        console.log('[GitHub Callback] JWT_SECRET present:', !!jwtSecret);
+        console.log('[GitHub Callback] Signed state length:', signedState.length);
         decodedState = jwt.verify(signedState, jwtSecret);
         console.log('[GitHub Callback] Signed state verified successfully ✓');
+        console.log('[GitHub Callback] Decoded state:', { 
+          hasState: !!decodedState.state, 
+          timestamp: decodedState.timestamp,
+          iat: decodedState.iat,
+          exp: decodedState.exp,
+        });
       } catch (jwtError) {
-        console.error('[GitHub Callback] Failed to verify signed state:', jwtError.message);
+        jwtErrorDetails = {
+          name: jwtError.name,
+          message: jwtError.message,
+          expiredAt: jwtError.expiredAt,
+        };
+        console.error('[GitHub Callback] Failed to verify signed state:', jwtErrorDetails);
+        console.error('[GitHub Callback] JWT Error type:', jwtError.name);
+        if (jwtError.name === 'TokenExpiredError') {
+          console.error('[GitHub Callback] Token expired at:', jwtError.expiredAt);
+        } else if (jwtError.name === 'JsonWebTokenError') {
+          console.error('[GitHub Callback] JWT format error - token may be malformed');
+        }
         decodedState = null;
       }
     }
@@ -82,11 +105,24 @@ export default async function githubCallback(req, res) {
 
     if (!decodedState || !decodedState.state) {
       console.error('[GitHub Callback] Invalid or expired signed state');
-      return res.status(400).json({
+      const errorResponse = {
         error: 'Invalid state parameter',
         message: 'CSRF validation failed: state signature invalid or expired',
         details: 'The OAuth state could not be verified. It may have expired (10 minute limit) or been tampered with.',
-      });
+      };
+      
+      if (jwtErrorDetails) {
+        errorResponse.jwtError = jwtErrorDetails;
+        if (jwtErrorDetails.name === 'TokenExpiredError') {
+          errorResponse.message = 'CSRF validation failed: state token expired';
+          errorResponse.details = `The OAuth state token expired at ${jwtErrorDetails.expiredAt}. Please try logging in again.`;
+        } else if (jwtErrorDetails.name === 'JsonWebTokenError') {
+          errorResponse.message = 'CSRF validation failed: invalid state token format';
+          errorResponse.details = 'The OAuth state token format is invalid. This may indicate the token was corrupted during the redirect.';
+        }
+      }
+      
+      return res.status(400).json(errorResponse);
     }
 
     console.log('[GitHub Callback] State validation successful ✓ (signed state verified)');
